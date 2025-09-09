@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yokai_quiz_app/Widgets/progressHud.dart';
-import 'package:yokai_quiz_app/screens/read/view/story_open_story_page.dart';
+import 'package:yokai_quiz_app/screens/read/view/story_details_screen.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
 import 'package:yokai_quiz_app/util/constants.dart';
@@ -13,6 +13,7 @@ import '../../../util/text_styles.dart';
 import '../../chat/controller/chat_controller.dart';
 import '../../home/controller/home_controller.dart';
 import '../controller/read_controller.dart';
+import 'open_story_screen.dart';
 
 class BrowseStoriesPage extends StatefulWidget {
   const BrowseStoriesPage({super.key});
@@ -48,6 +49,7 @@ class _BrowseStoriesPageState extends State<BrowseStoriesPage> {
                 const EdgeInsets.only(right: 20, left: 20, bottom: 16, top: 60),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Browse Stories '.tr,
@@ -76,7 +78,7 @@ class _BrowseStoriesPageState extends State<BrowseStoriesPage> {
                         childAspectRatio: 1,
                         crossAxisSpacing: 1,
                         mainAxisSpacing: 5,
-                        mainAxisExtent: screenSize.height / 5),
+                        mainAxisExtent: screenSize.height / 4.7),
                     // itemCount: ReadController.read.length,
                     itemCount:
                         ReadController.getAllStoriesBy.value.data?.length,
@@ -87,7 +89,7 @@ class _BrowseStoriesPageState extends State<BrowseStoriesPage> {
                           ChatController.backToCharacters(false);
                           HomeController.backToHome(false);
                           ReadController.storyId('');
-                          Get.to(OpenStoryPage(
+                          Get.to(StoryDetailsScreen(
                             storyId: ReadController
                                     .getAllStoriesBy.value.data?[index].id
                                     .toString() ??
@@ -99,7 +101,7 @@ class _BrowseStoriesPageState extends State<BrowseStoriesPage> {
                               '');
                         },
                         child: Container(
-                          height: screenSize.height / 4.6,
+                          height: screenSize.height / 4.5,
                           width: screenSize.width / 4,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),

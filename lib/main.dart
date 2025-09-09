@@ -1,82 +1,65 @@
+/// main.dart -->
+
 import 'dart:io';
-
-import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-import 'package:yokai_quiz_app/Widgets/splash_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:yokai_quiz_app/global.dart';
-import 'package:yokai_quiz_app/language/app_localization.dart';
-import 'package:yokai_quiz_app/util/constants.dart';
-import 'package:flutter_line_sdk/flutter_line_sdk.dart';
+
+import 'config/firebase_config.dart';
+import 'config/line_sdk_config.dart';
+import 'config/revenue_cat_config.dart';
+import 'services/app_state_manager.dart';
+import 'services/unified_notification_service.dart';
+import 'services/unity_game_service.dart';
+import 'api/cache_service.dart';
+import 'api/ultra_fast_api_service.dart';
+import 'myapp.dart';
+import 'package:get/get.dart';
+
 // SharedPreferences? prefs;
 // const String appName = "B.AI";
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-  }
+// Avoid initializing Firebase in the background handler
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('Background message received: ${message.notification?.title}');
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  WidgetsFlutterBinding.ensureInitialized();
-  prefs = await SharedPreferences.getInstance();
-  await LineSDK.instance.setup('2006749396',universalLink: "https://admin.yokaizenteams.com/").then((_) {
-    print('LineSDK Prepared');
-  });
   
-  if (Platform.isAndroid) {
-    await Firebase.initializeApp(
-        options: const FirebaseOptions(
-            apiKey: "AIzaSyDqtImJuX5KXz3woxkhpWTbTiTkU2J-W8U",
-            projectId: "yokaizen-43f63",
-            messagingSenderId: "543257928924",
-            appId: "1:543257928924:android:b374bd4fc856d39e08c019"));
-  } else {
-    await Firebase.initializeApp();
-  }
+  // Initialize Firebase with the improved singleton approach
+  await FirebaseConfig.init();
+  
+  // Get FCM token - example of how to access it
+  String? fcmToken = await FirebaseConfig.instance.getFCMToken();
+  customPrint('Main: FCM Token for API: $fcmToken');
+  
+  // You can now send this token to your backend API
+  // await yourApiService.sendFCMToken(fcmToken);
+  
   prefs = await SharedPreferences.getInstance();
-
+  await LineSDKConfig.init();
+  await RevenueCatConfig.init();
   await dotenv.load(fileName: '.env');
-
+  
+  // Initialize cache service
+  await CacheService().initialize();
+  
+  // Register AppStateManager early for dependency injection
+  Get.put(AppStateManager(), permanent: true);
+  
+  // Initialize Unity Game Service
+  Get.put(UnityGameService(), permanent: true);
+  
+  // Initialize unified notification service
+  await UnifiedNotificationService().initialize();
+  
+  customPrint('🚀 App initialization completed - starting MyApp');
   runApp(const MyApp());
 }
 
 late SharedPreferences prefs;
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    checkDebugMode();
-    return GetMaterialApp(
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      translations: AppLocalization(),
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ja'),
-        Locale('ko'),
-      ],
-      locale: constants.locale,
-      fallbackLocale: const Locale('es', 'US'),
-      theme: ThemeData(useMaterial3: false),
-      debugShowCheckedModeBanner: false,
-      // color: appColor,
-      // home: TopicalExam_page(subjectName: "History",));
-      home: const SplashScreen(),
-    );
-  }
-}

@@ -39,7 +39,7 @@ class _NotificationSettingState extends State<NotificationSetting> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('General Notification'),
+                Text('General Notification'.tr),
                 GestureDetector(
                   onTap: () {
                     setState(() {

@@ -1,0 +1,358 @@
+import 'package:uuid/uuid.dart';
+
+enum QuizType {
+  multipleChoice,
+  trueFalse,
+  matching,
+  sorting,
+  freeResponse,
+}
+
+enum QuestionType {
+  multipleChoice,
+  multipleAnswer,
+  trueFalse,
+  matching,
+  sorting,
+  ordering,
+  freeResponse,
+  shortAnswer,
+}
+
+class QuizModule {
+  final String id;
+  final String title;
+  final String description;
+  final QuizType quizType;
+  final String difficulty;
+  final int timeLimit; // in minutes, 0 for no limit
+  final int passingScore; // percentage to pass
+  final List<Question> questions;
+  final QuizFeedback feedback;
+  final Map<String, dynamic> appearance;
+  
+  QuizModule({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.quizType,
+    required this.difficulty,
+    required this.timeLimit,
+    required this.passingScore,
+    required this.questions,
+    required this.feedback,
+    required this.appearance,
+  });
+  
+  // Create a new quiz with default values
+  factory QuizModule.createDefault(QuizType type) {
+    const uuid = Uuid();
+    
+    // Set default title based on quiz type
+    String title;
+    String description;
+    
+    switch (type) {
+      case QuizType.multipleChoice:
+        title = 'Multiple Choice Quiz';
+        description = 'Test your knowledge with these multiple choice questions';
+        break;
+      case QuizType.trueFalse:
+        title = 'True/False Quiz';
+        description = 'Determine whether each statement is true or false';
+        break;
+      case QuizType.matching:
+        title = 'Matching Quiz';
+        description = 'Match items in the left column with those in the right column';
+        break;
+      case QuizType.sorting:
+        title = 'Sorting Quiz';
+        description = 'Sort or categorize items into the correct groups';
+        break;
+      case QuizType.freeResponse:
+        title = 'Free Response Quiz';
+        description = 'Answer these questions in your own words';
+        break;
+    }
+    
+    return QuizModule(
+      id: uuid.v4(),
+      title: title,
+      description: description,
+      quizType: type,
+      difficulty: 'medium',
+      timeLimit: 0, // No time limit by default
+      passingScore: 70, // 70% passing by default
+      questions: [],
+      feedback: QuizFeedback(
+        perfectScore: 'Congratulations! You got a perfect score!',
+        passingScore: 'Good job! You passed the quiz.',
+        failingScore: 'Keep practicing. You\'ll do better next time.',
+        showCorrectAnswers: true,
+        showExplanations: true,
+        allowRetakes: true,
+      ),
+      appearance: {
+        'theme': 'default',
+        'primaryColor': '#3F51B5',
+        'secondaryColor': '#FFC107',
+        'backgroundColor': '#FFFFFF',
+        'fontFamily': 'Roboto',
+      },
+    );
+  }
+  
+  // Copy with method for immutability
+  QuizModule copyWith({
+    String? id,
+    String? title,
+    String? description,
+    QuizType? quizType,
+    String? difficulty,
+    int? timeLimit,
+    int? passingScore,
+    List<Question>? questions,
+    QuizFeedback? feedback,
+    Map<String, dynamic>? appearance,
+  }) {
+    return QuizModule(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      quizType: quizType ?? this.quizType,
+      difficulty: difficulty ?? this.difficulty,
+      timeLimit: timeLimit ?? this.timeLimit,
+      passingScore: passingScore ?? this.passingScore,
+      questions: questions ?? this.questions,
+      feedback: feedback ?? this.feedback,
+      appearance: appearance ?? this.appearance,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'quizType': quizType.toString().split('.').last,
+      'difficulty': difficulty,
+      'timeLimit': timeLimit,
+      'passingScore': passingScore,
+      'questions': questions.map((q) => q.toJson()).toList(),
+      'feedback': feedback.toJson(),
+      'appearance': appearance,
+    };
+  }
+  
+  // Create from JSON
+  factory QuizModule.fromJson(Map<String, dynamic> json) {
+    return QuizModule(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      quizType: QuizType.values.firstWhere(
+        (e) => e.toString().split('.').last == json['quizType'],
+        orElse: () => QuizType.multipleChoice,
+      ),
+      difficulty: json['difficulty'],
+      timeLimit: json['timeLimit'],
+      passingScore: json['passingScore'],
+      questions: (json['questions'] as List).map((q) => Question.fromJson(q)).toList(),
+      feedback: QuizFeedback.fromJson(json['feedback']),
+      appearance: Map<String, dynamic>.from(json['appearance']),
+    );
+  }
+}
+
+class Question {
+  final String id;
+  final String text;
+  final QuestionType questionType;
+  final List<Option> options;
+  final int points;
+  final String difficulty;
+  final String explanation;
+  
+  Question({
+    required this.id,
+    required this.text,
+    required this.questionType,
+    required this.options,
+    required this.points,
+    required this.difficulty,
+    required this.explanation,
+  });
+  
+  // Copy with method for immutability
+  Question copyWith({
+    String? id,
+    String? text,
+    QuestionType? questionType,
+    List<Option>? options,
+    int? points,
+    String? difficulty,
+    String? explanation,
+  }) {
+    return Question(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      questionType: questionType ?? this.questionType,
+      options: options ?? this.options,
+      points: points ?? this.points,
+      difficulty: difficulty ?? this.difficulty,
+      explanation: explanation ?? this.explanation,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'text': text,
+      'questionType': questionType.toString().split('.').last,
+      'options': options.map((o) => o.toJson()).toList(),
+      'points': points,
+      'difficulty': difficulty,
+      'explanation': explanation,
+    };
+  }
+  
+  // Create from JSON
+  factory Question.fromJson(Map<String, dynamic> json) {
+    return Question(
+      id: json['id'],
+      text: json['text'],
+      questionType: QuestionType.values.firstWhere(
+        (e) => e.toString().split('.').last == json['questionType'],
+        orElse: () => QuestionType.multipleChoice,
+      ),
+      options: (json['options'] as List).map((o) => Option.fromJson(o)).toList(),
+      points: json['points'],
+      difficulty: json['difficulty'],
+      explanation: json['explanation'],
+    );
+  }
+}
+
+class Option {
+  final String id;
+  final String text;
+  final bool isCorrect;
+  final String? matchTo; // For matching questions
+  final int? sortOrder; // For ordering questions
+  final String? category; // For sorting/categorization questions
+  
+  Option({
+    required this.id,
+    required this.text,
+    required this.isCorrect,
+    this.matchTo,
+    this.sortOrder,
+    this.category,
+  });
+  
+  // Copy with method for immutability
+  Option copyWith({
+    String? id,
+    String? text,
+    bool? isCorrect,
+    String? matchTo,
+    int? sortOrder,
+    String? category,
+  }) {
+    return Option(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      isCorrect: isCorrect ?? this.isCorrect,
+      matchTo: matchTo ?? this.matchTo,
+      sortOrder: sortOrder ?? this.sortOrder,
+      category: category ?? this.category,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'text': text,
+      'isCorrect': isCorrect,
+      if (matchTo != null) 'matchTo': matchTo,
+      if (sortOrder != null) 'sortOrder': sortOrder,
+      if (category != null) 'category': category,
+    };
+  }
+  
+  // Create from JSON
+  factory Option.fromJson(Map<String, dynamic> json) {
+    return Option(
+      id: json['id'],
+      text: json['text'],
+      isCorrect: json['isCorrect'],
+      matchTo: json['matchTo'],
+      sortOrder: json['sortOrder'],
+      category: json['category'],
+    );
+  }
+}
+
+class QuizFeedback {
+  final String perfectScore;
+  final String passingScore;
+  final String failingScore;
+  final bool showCorrectAnswers;
+  final bool showExplanations;
+  final bool allowRetakes;
+  
+  QuizFeedback({
+    required this.perfectScore,
+    required this.passingScore,
+    required this.failingScore,
+    required this.showCorrectAnswers,
+    required this.showExplanations,
+    required this.allowRetakes,
+  });
+  
+  // Copy with method for immutability
+  QuizFeedback copyWith({
+    String? perfectScore,
+    String? passingScore,
+    String? failingScore,
+    bool? showCorrectAnswers,
+    bool? showExplanations,
+    bool? allowRetakes,
+  }) {
+    return QuizFeedback(
+      perfectScore: perfectScore ?? this.perfectScore,
+      passingScore: passingScore ?? this.passingScore,
+      failingScore: failingScore ?? this.failingScore,
+      showCorrectAnswers: showCorrectAnswers ?? this.showCorrectAnswers,
+      showExplanations: showExplanations ?? this.showExplanations,
+      allowRetakes: allowRetakes ?? this.allowRetakes,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'perfectScore': perfectScore,
+      'passingScore': passingScore,
+      'failingScore': failingScore,
+      'showCorrectAnswers': showCorrectAnswers,
+      'showExplanations': showExplanations,
+      'allowRetakes': allowRetakes,
+    };
+  }
+  
+  // Create from JSON
+  factory QuizFeedback.fromJson(Map<String, dynamic> json) {
+    return QuizFeedback(
+      perfectScore: json['perfectScore'],
+      passingScore: json['passingScore'],
+      failingScore: json['failingScore'],
+      showCorrectAnswers: json['showCorrectAnswers'],
+      showExplanations: json['showExplanations'],
+      allowRetakes: json['allowRetakes'],
+    );
+  }
+}

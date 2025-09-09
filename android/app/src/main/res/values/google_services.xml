@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Web client ID from your Firebase Console -->
+    <string name="default_web_client_id">543257928924-i4o2ahdgftkb684eb61dlm65c9a85f4h.apps.googleusercontent.com</string>
+    
+    <!-- SHA-1 Fingerprints for both release and debug -->
+    <string name="release_sha1_fingerprint">16FE260731BF4852BA8CA87148B27471FF0F6DCD</string>
+    <string name="debug_sha1_fingerprint">17A02C36EFE659E8723EB331FB766ADC77CFE837</string>
+</resources> 

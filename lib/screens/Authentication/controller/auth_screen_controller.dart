@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
@@ -31,6 +32,8 @@ class AuthScreenController {
 
   static Rx<GetUserProfile> getProfileModel = GetUserProfile().obs;
 
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+
   static Future<bool> createAccount(BuildContext context, body) async {
     final String url = DatabaseApi.create;
     final headers = {
@@ -49,14 +52,16 @@ class AuthScreenController {
         headers: headers,
       )
           .then((value) async {
+        print("inside http post request value :: $value");
         final jsonData = jsonDecode(value.body);
         if (jsonData["status"].toString() != "true") {
-          showErrorMessage(jsonData["message"], colorError);
+          String errorMessage = jsonData["message"].toString().replaceAll("_", " ");
+          showErrorMessage(errorMessage.tr, colorError);
           customPrint("createActivity response :: ${value.body}");
-          customPrint("createActivity message::${jsonData["message"]}");
+          customPrint("createActivity message 2222222 ::${jsonData["message"]}");
           return false;
         } else {
-          showSucessMessage(jsonData["message"], colorSuccess);
+          // showSucessMessage(jsonData["message"], colorSuccess);
         }
         customPrint("createActivity::${value.body}");
         return true;
@@ -87,7 +92,7 @@ class AuthScreenController {
         if (jsonData["success"].toString() != "true") {
           showErrorMessage(jsonData["message"], colorError);
           customPrint("createActivity response :: ${value.body}");
-          customPrint("createActivity message::${jsonData["message"]}");
+          customPrint("createActivity message 1111111::${jsonData["message"]}");
           return false;
         } else {
           prefs.setString(LocalStorage.tokenNode, jsonData["token"].toString());
@@ -169,19 +174,20 @@ class AuthScreenController {
         if (jsonData["status"].toString() != "true") {
           isApiLoginSuccess(false);
           if (isFirebaseLoginSuccess.isFalse) {
-            showErrorMessage(jsonData["message"], colorError);
+            showErrorMessage("Login Failed", colorError);
           }
           print('login :: ${jsonData["message"]}');
           return false;
         } else {
           isApiLoginSuccess(true);
-          showSucessMessage(jsonData["message"], colorSuccess);
+          showSucessMessage("User Login Successfully", colorSuccess);
           prefs.clear();
           prefs.setString(LocalStorage.token, jsonData["token"].toString());
           prefs.setBool(LocalStorage.isLogin, true);
           print('token :: ${prefs.getString(LocalStorage.token)}');
         }
-        print("login::${value.body}");
+        print("signInWithGoogle login:: ${value.body}");
+        // nodeLoginGoogle(context);
         return true;
       });
     } on Exception catch (e) {
@@ -194,6 +200,129 @@ class AuthScreenController {
     }
   }
 
+  static Future<bool> nodeLoginGoogle(BuildContext context) async {
+    customPrint("nodeLoginGoogle got invoked");
+    try {
+      // Change auth.currentUser to _auth.currentUser
+      final user = _auth.currentUser;
+      if (user == null) {
+        print('No Firebase user found');
+        return false;
+      }
+
+      // Get fresh ID token
+      final idToken = await user.getIdToken(true); // Force refresh token
+      
+      final String url = NodeDatabaseApi.loginGoogle;
+      final headers = {
+        "Content-Type": "application/json",
+        // "accept": "application/json",
+      };
+      
+      final requestBody = {
+        "idToken": idToken
+      };
+
+      print("Node login URL: $url");
+      print("Node login body: ${jsonEncode(requestBody)}");
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(requestBody),
+      );
+
+      final jsonData = jsonDecode(response.body);
+      print("Node login response: ${response.body}");
+
+      if (jsonData["success"] == true) { // Changed from string comparison to boolean
+        isApiLoginSuccess(true);
+        
+        // Store Node backend tokens
+        await prefs.setString(LocalStorage.tokenNode, jsonData["token"].toString());
+        await prefs.setString(LocalStorage.idNode, jsonData["user"]["userId"].toString());
+        
+        print('Node token: ${prefs.getString(LocalStorage.tokenNode)}');
+        print('Node ID: ${prefs.getString(LocalStorage.idNode)}');
+        return true;
+      } else {
+        isApiLoginSuccess(false);
+        if (isFirebaseLoginSuccess.isFalse) {
+          showErrorMessage(jsonData["message"] ?? "Authentication failed", colorError);
+        }
+        print('Node login failed: ${jsonData["message"]}');
+        return false;
+      }
+
+    } catch (e) {
+      print("Node login error: $e");
+      customPrint("Error: $e");
+      showErrorMessage("Failed to authenticate with companion service", colorError);
+      return false;
+    }
+  }
+
+  static Future<bool> nodeLoginApple(BuildContext context) async {
+    customPrint("nodeLoginApple got invoked");
+    try {
+      // Check for Firebase user
+      final user = _auth.currentUser;
+      if (user == null) {
+        print('No Firebase user found');
+        return false;
+      }
+
+      // Get fresh ID token from Firebase
+      final idToken = await user.getIdToken(true); // Force refresh token
+
+      final String url = NodeDatabaseApi.loginApple;
+      final headers = {
+        "Content-Type": "application/json",
+      };
+
+      final requestBody = {
+        "idToken": idToken
+      };
+
+      print("Node login URL: $url");
+      print("Node login body: ${jsonEncode(requestBody)}");
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(requestBody),
+      );
+
+      final jsonData = jsonDecode(response.body);
+      print("Node login response: ${response.body}");
+
+      if (jsonData["success"] == true) {
+        isApiLoginSuccess(true);
+
+        // Store Node backend tokens
+        await prefs.setString(LocalStorage.tokenNode, jsonData["token"].toString());
+        await prefs.setString(LocalStorage.idNode, jsonData["user"]["userId"].toString());
+
+        print('Node token: ${prefs.getString(LocalStorage.tokenNode)}');
+        print('Node ID: ${prefs.getString(LocalStorage.idNode)}');
+        return true;
+      } else {
+        isApiLoginSuccess(false);
+        if (isFirebaseLoginSuccess.isFalse) {
+          showErrorMessage(jsonData["message"] ?? "Authentication failed", colorError);
+        }
+        print('Node login failed: ${jsonData["message"]}');
+        return false;
+      }
+
+    } catch (e) {
+      print("Node login error: $e");
+      customPrint("Error: $e");
+      showErrorMessage("Failed to authenticate with companion service", colorError);
+      return false;
+    }
+  }
+
   static Future<bool> nodeLogin(BuildContext context, body) async {
     final String url = NodeDatabaseApi.login;
     final headers = {
@@ -202,8 +331,8 @@ class AuthScreenController {
     };
     print(headers);
 
-    print("login Url::$url");
-    print("login body::${jsonEncode(body)}");
+    print("nodeLogin Url::$url");
+    print("nodeLogin body::${jsonEncode(body)}");
     try {
       return await http
           .post(
@@ -214,11 +343,13 @@ class AuthScreenController {
           .then((value) async {
         final jsonData = jsonDecode(value.body);
         if (jsonData["success"].toString() != "true") {
+          customPrint("inside if means jsonData true");
           isApiLoginSuccess(false);
           if (isFirebaseLoginSuccess.isFalse) {
+            customPrint("inside if if means error message ");
             showErrorMessage(jsonData["message"], colorError);
           }
-          print('login :: ${jsonData["message"]}');
+          print('nodeLogin :: ${jsonData["message"]}');
           return false;
         } else {
           isApiLoginSuccess(true);
@@ -256,23 +387,23 @@ class AuthScreenController {
       return true;
     } catch (e) {
       isFirebaseLoginSuccess(false);
-      showErrorMessage("$e", colorError);
-      print('loginWithFirebase Error: $e');
+      String errorMessage = e.toString().replaceAll(RegExp(r'\[.*?\]\s*'), '');
+      showErrorMessage(errorMessage, colorError);
+      print('loginWithFirebase Error: $errorMessage');
       return false;
     }
   }
 
-  static Future<bool> signUpWithFirebase(
+  static Future<String> signUpWithFirebase(
       BuildContext context, String email, String password) async {
     customPrint("signUpWithFirebase body::$email - $password");
     try {
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
       print('Signup successful!');
-      return true;
-    } catch (e) {
-      print('signUpWithFirebase Error: $e');
-      return false;
+      return "true";
+    } on FirebaseAuthException catch (e) {
+      print('signUpWithFirebase Error: ${e.message}');
+      return "${e.message}";
     }
   }
 
@@ -360,7 +491,7 @@ class AuthScreenController {
     final headers = {
       "Content-Type": "application/json",
       "accept": "application/json",
-      "AdminToken": prefs.getString(LocalStorage.token).toString()
+      "UserToken": prefs.getString(LocalStorage.token).toString()
     };
     print(headers);
 
@@ -404,7 +535,10 @@ class AuthScreenController {
               getProfileModel.value.user?.email.toString() ?? '';
 
           userId = getProfileModel.value.user!.userId ?? 1;
+          prefs.setString(LocalStorage.id, userId.toString());
         }
+
+
         // isLoading(false);
       });
     }
@@ -438,43 +572,80 @@ class AuthScreenController {
   //     print('Error signing in with Google: $e');
   //   }
   // }
-  static final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
   static RxString googleName = ''.obs;
   static RxString googleEmail = ''.obs;
   static RxString googlePhoneNumber = ''.obs;
   static RxString googleUid = ''.obs;
 
-  static Future<void> signInWithGoogle() async {
+  static Future<Map<String, dynamic>> signInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      print("signInWithGoogle got invoked");
+
+      // Clear any previous sign-in
+      await GoogleSignIn().signOut();
+
+      // For Android release builds, we don't need to explicitly specify clientId
+      // as it's configured through google-services.json
+      // Just use the default constructor with scopes
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+      );
+
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      
+      // If user cancels the sign-in flow
       if (googleUser == null) {
-        // The user canceled the sign-in
-        return;
+        print("Google Sign-In was cancelled by user");
+        return {"success": false, "message": "Sign in cancelled"};
       }
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final auth.AuthCredential credential = auth.GoogleAuthProvider.credential(
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      
+      // Log tokens for debugging (remove in production)
+      print("Google Auth has access token: ${googleAuth.accessToken != null}");
+      print("Google Auth has ID token: ${googleAuth.idToken != null}");
+
+      if (googleAuth.idToken == null) {
+        print("Failed to obtain ID token from Google");
+        return {"success": false, "message": "Failed to obtain authentication token"};
+      }
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final auth.UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-      final auth.User? user = userCredential.user;
-
-      if (user != null) {
-        googleEmail(user.email);
-        googleUid(user.uid);
-        googleName(user.displayName);
-        googlePhoneNumber(user.phoneNumber);
-        print('Signed in as googleName :: ${user.displayName}');
-        print('Signed in as googleEmail :: ${user.email}');
-        print('Signed in as googlePhoneNumber :: ${user.phoneNumber}');
-        print('Signed in as googleUid :: ${user.uid}');
+      try {
+        // Sign in to Firebase with the credential
+        final UserCredential userCredential = 
+            await FirebaseAuth.instance.signInWithCredential(credential);
+          
+        if (userCredential.user != null) {
+          googleEmail(userCredential.user!.email);
+          googleUid(userCredential.user!.uid);
+          googleName(userCredential.user!.displayName);
+          googlePhoneNumber(userCredential.user!.phoneNumber);
+          print('Signed in as googleName :: ${userCredential.user!.displayName}');
+          print('Signed in as googleEmail :: ${userCredential.user!.email}');
+          print('Signed in as googlePhoneNumber :: ${userCredential.user!.phoneNumber}');
+          print('Signed in as googleUid :: ${userCredential.user!.uid}');
+          return {"success": true, "message": "Sign in successful"};
+        } else {
+          print("Firebase returned null user after credential sign-in");
+          return {"success": false, "message": "Authentication failed"};
+        }
+      } catch (firebaseError) {
+        print("Firebase auth error: $firebaseError");
+        return {"success": false, "message": "Firebase authentication failed: $firebaseError"};
       }
     } catch (e) {
-      print('Error signing in with Google: $e');
+      print("Error signing in with Google: $e");
+      showErrorMessage("Google Sign In Error: ${e.toString()}", colorError);
+      return {"success": false, "message": e.toString()};
     }
   }
 
@@ -485,37 +656,6 @@ class AuthScreenController {
   static RxString appleUid = ''.obs;
   static RxString applePhoneNumber = ''.obs;
 
-  // static Future<void> signInWithApple() async {
-  //   try {
-  //     // Trigger the sign-in flow
-  //     final AuthorizationCredentialAppleID credential = await SignInWithApple.getAppleIDCredential(
-  //       scopes: [
-  //         AppleIDAuthorizationScopes.fullName,
-  //         AppleIDAuthorizationScopes.email,
-  //       ],
-  //     );
-  //     // Create a new credential
-  //     final auth.AuthCredential firebaseCredential = auth.OAuthProvider("apple.com").credential(
-  //       idToken: credential.identityToken,
-  //       accessToken: credential.authorizationCode,
-  //     );
-  //
-  //     // Sign in to Firebase with the credential
-  //     final auth.UserCredential userCredential = await _auth.signInWithCredential(firebaseCredential);
-  //     final auth.User? user = userCredential.user;
-  //
-  //     if (user != null) {
-  //       appleEmail(user.email ?? '');
-  //       appleUid(user.uid);
-  //       appleName(user.displayName ?? '');
-  //       print('Signed in as appleName :: ${user.displayName}');
-  //       print('Signed in as appleEmail :: ${user.email}');
-  //       print('Signed in as appleUid :: ${user.uid}');
-  //     }
-  //   } catch (e) {
-  //     print('Error signing in with Apple: $e');
-  //   }
-  // }
   ///
   // static Future<void> signInWithApple() async {
   //   try {
@@ -554,8 +694,54 @@ class AuthScreenController {
   //     }
   //   }
   // }
+
+
+  // static Future<void> signInWithApple() async {
+  //   try {
+  //     // Trigger the sign-in flow
+  //     final AuthorizationCredentialAppleID credential = await SignInWithApple.getAppleIDCredential(
+  //       scopes: [
+  //         AppleIDAuthorizationScopes.fullName,
+  //         AppleIDAuthorizationScopes.email,
+  //       ],
+  //     );
+  //     // Create a new credential
+  //     final auth.AuthCredential firebaseCredential = auth.OAuthProvider("apple.com").credential(
+  //       idToken: credential.identityToken,
+  //       accessToken: credential.authorizationCode,
+  //     );
+  //
+  //     // Sign in to Firebase with the credential
+  //     final auth.UserCredential userCredential = await _auth.signInWithCredential(firebaseCredential);
+  //     final auth.User? user = userCredential.user;
+  //
+  //     if (user != null) {
+  //       appleEmail(user.email ?? '');
+  //       appleUid(user.uid);
+  //       appleName(user.displayName ?? '');
+  //       print('Signed in as appleName :: ${user.displayName}');
+  //       print('Signed in as appleEmail :: ${user.email}');
+  //       print('Signed in as appleUid :: ${user.uid}');
+  //     }
+  //   } catch (e) {
+  //     print('Error signing in with Apple: $e');
+  //   }
+  // }
+
   static Future<void> signInWithApple() async {
+    print("signInWithApple got invoked");
     try {
+      // Check if Apple Sign-In is available first
+      print("Checking if Apple Sign-In is available...");
+      bool isAvailable = await SignInWithApple.isAvailable();
+      print("Apple Sign-In available: $isAvailable");
+      
+      if (!isAvailable) {
+        throw Exception('Apple Sign-In is not available on this device. Please test on a physical device with iOS 13+ and ensure the app has Apple Sign-In capability enabled in Xcode.');
+      }
+
+      print("Requesting Apple ID credential...");
+      // Request Apple ID credential with minimal configuration first
       final AuthorizationCredentialAppleID credential =
           await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -564,57 +750,105 @@ class AuthScreenController {
         ],
       );
 
+      print("signInWithApple credential obtained");
+      print("Credential givenName: ${credential.givenName}");
+      print("Credential familyName: ${credential.familyName}");
+      print("Credential email: ${credential.email}");
+
+      // Create Firebase credential (without nonce for now)
       final auth.AuthCredential firebaseCredential =
           auth.OAuthProvider("apple.com").credential(
         idToken: credential.identityToken,
         accessToken: credential.authorizationCode,
       );
 
+      print("signInWithApple firebaseCredential created");
+
+      // Sign in to Firebase
       final auth.UserCredential userCredential =
           await _auth.signInWithCredential(firebaseCredential);
       final auth.User? user = userCredential.user;
 
       if (user != null) {
-        // Check if the user's full name is available
+        print("Firebase user obtained: ${user.uid}");
+        
+        // Set UID first
+        appleUid(user.uid);
+        
+        // Handle name - prioritize credential data over Firebase user data
+        String fullName = '';
         if (credential.givenName != null && credential.familyName != null) {
-          appleName('${credential.givenName} ${credential.familyName}');
-        } else {
-          // Handle the case where the user's full name is not available
-          appleName('Name not available');
+          fullName = '${credential.givenName} ${credential.familyName}';
+        } else if (credential.givenName != null) {
+          fullName = credential.givenName!;
+        } else if (user.displayName != null && user.displayName!.isNotEmpty) {
+          fullName = user.displayName!;
         }
+        appleName(fullName);
 
-        // Check if the user's email address is available
+        // Handle email - prioritize credential email over Firebase user email
+        String emailAddress = '';
         if (credential.email != null && credential.email!.isNotEmpty) {
-          appleEmail(credential.email);
+          emailAddress = credential.email!;
+        } else if (user.email != null && user.email!.isNotEmpty) {
+          emailAddress = user.email!;
+        }
+        
+        // Only set email if we have a valid one
+        if (emailAddress.isNotEmpty && emailAddress != 'null') {
+          appleEmail(emailAddress);
         } else {
-          // Handle the case where the user chooses not to share their email address
-          appleEmail('Email not available');
+          // Handle the case where no email is available (common on subsequent sign-ins)
+          // Apple only provides email on first sign-in, so we'll use a fallback approach
+          appleEmail(''); // Set empty string - this is expected behavior
+          print('Info: No email available from Apple Sign-In (normal for subsequent sign-ins)');
         }
 
-        // appleUid(user.uid);
-        // print('Signed in as appleName :: $appleName');
-        // print('Signed in as appleEmail :: $appleEmail');
-        // print('Signed in as appleUid :: $appleUid');
-
-        final auth.User? user = userCredential.user;
-        if (user != null) {
-          appleEmail(user.email);
-          appleName(user.displayName);
-          appleUid(user.uid);
-          print('Signed in as appleName :: ${user.displayName}');
-          print('Signed in as appleEmail :: ${user.email}');
-          print('Signed in as appleUid :: ${user.uid}');
-        } else {
-          print('user == null');
-        }
+        print('Apple Sign-In Success:');
+        print('Name: ${appleName.value}');
+        print('Email: ${appleEmail.value}');
+        print('UID: ${appleUid.value}');
+        
+        // Set success flag
+        isFirebaseLoginSuccess(true);
+        
+      } else {
+        print('Error: Firebase user is null after successful credential sign-in');
+        throw Exception('Firebase authentication failed');
       }
     } catch (e) {
+      print("Apple Sign-In Error: $e");
+      
+      // Reset values on error
+      appleEmail('');
+      appleName('');
+      appleUid('');
+      isFirebaseLoginSuccess(false);
+      
       if (e is SignInWithAppleAuthorizationException) {
         print('Authorization error: ${e.code}, ${e.message}');
+        switch (e.code) {
+          case AuthorizationErrorCode.canceled:
+            throw Exception('Apple Sign-In was canceled by user');
+          case AuthorizationErrorCode.failed:
+            throw Exception('Apple Sign-In failed. Please try again.');
+          case AuthorizationErrorCode.invalidResponse:
+            throw Exception('Invalid response from Apple. Please try again.');
+          case AuthorizationErrorCode.notHandled:
+            throw Exception('Apple Sign-In not handled properly');
+          case AuthorizationErrorCode.unknown:
+            throw Exception('Apple Sign-In failed with unknown error. Please check your internet connection and try again.');
+          default:
+            throw Exception('Apple Sign-In failed: ${e.message}');
+        }
       } else if (e is PlatformException) {
         print('Platform error: ${e.code}, ${e.message}');
+        throw Exception('Platform error during Apple Sign-In: ${e.message}');
+      } else if (e is auth.FirebaseAuthException) {
+        print('Firebase Auth error: ${e.code}, ${e.message}');
+        throw Exception('Authentication failed: ${e.message}');
       } else {
-        print('Error signing in with Apple: $e');
+        throw Exception('Apple Sign-In failed: ${e.toString()}');
       }
     }
   }
@@ -651,6 +885,8 @@ class AuthScreenController {
       ],
       nonce: nonce,
     );
+
+    print("Apple Credential: ${appleCredential}");
 
     // Create an `OAuthCredential` from the credential returned by Apple.
     final oauthCredential = OAuthProvider("apple.com").credential(
@@ -690,7 +926,7 @@ class AuthScreenController {
           isCheckEmail(false);
         }
         if (jsonData["status"].toString() != "true") {
-          showErrorMessage(jsonData["message"].toString(), colorError);
+          // showErrorMessage(jsonData["message"].toString(), colorError);
           return false;
         }
         return true;
@@ -698,6 +934,200 @@ class AuthScreenController {
     } on Exception catch (e) {
       print("checkEmail:: $e");
       // showSnackbar("Some unknown error has occur, try again after some time!", colorError);
+      return false;
+    }
+  }
+
+  static Future<bool> handleLineLogin(BuildContext context, Map<String, dynamic> body) async {
+    try {
+      // First check if user exists
+      final response = await checkLineUser(body['line_id']);
+      
+      if (response['exists']) {
+        // Login existing user
+        return await loginWithLine(context, body);
+      } else {
+        // Create new user
+        return await createLineUser(context, body);
+      }
+    } catch (e) {
+      print('LINE Login Handler Error: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> loginWithLine(BuildContext context, Map<String, dynamic> body) async {
+    final String url = DatabaseApi.login;
+    final headers = {
+      "Content-Type": "application/json",
+      "accept": "application/json",
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode({
+          "line_id": body["line_id"],
+          "login_type": "line"
+        }),
+      );
+
+      final jsonData = jsonDecode(response.body);
+      
+      if (jsonData["status"].toString() == "true") {
+        // Save user data to preferences
+        await prefs.setString(LocalStorage.token, jsonData["data"]["token"]);
+        await prefs.setString(LocalStorage.id, jsonData["data"]["id"].toString());
+        await prefs.setBool(LocalStorage.isLogin, true);
+        
+        // Get user profile after successful login
+        await getProfile();
+
+        // Navigate to home screen
+        // Get.offAll(() => const Navigation());
+        return true;
+      } else {
+        showErrorMessage(jsonData["message"], colorError);
+        return false;
+      }
+    } catch (e) {
+      print("Line Login Error: $e");
+      showErrorMessage("Failed to login with LINE", colorError);
+      return false;
+    }
+  }
+
+  static Future<bool> createLineUser(BuildContext context, Map<String, dynamic> body) async {
+    print("createLineUser got invoked body : $body");
+    final String url = DatabaseApi.create;
+    final headers = {
+      "Content-Type": "application/json",
+      "accept": "application/json",
+    };
+
+    try {
+      // Generate a random password for LINE users
+      final String randomPassword = generateRandomPassword();
+      
+      final Map<String, dynamic> userData = {
+        "name": body["name"],
+        "line_id": body["line_id"],
+        "avatar": body["avatar"],
+        "password": randomPassword,
+        "login_type": "line",
+        "device_type": Platform.isIOS ? "ios" : "android",
+        "device_token": await getDeviceToken()
+      };
+
+      print("createLineUser userData : $body");
+
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(userData),
+      );
+
+      final jsonData = jsonDecode(response.body);
+      
+      if (jsonData["status"].toString() == "true") {
+        // After creating user, login automatically
+        return await loginWithLine(context, body);
+      } else {
+        showErrorMessage(jsonData["message"], colorError);
+        return false;
+      }
+    } catch (e) {
+      print("Create Line User Error: $e");
+      showErrorMessage("Failed to create account with LINE", colorError);
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>> checkLineUser(String lineId) async {
+    final String url = '${DatabaseApi.checkLineUser}$lineId';
+    final headers = {
+      "Content-Type": "application/json",
+      "accept": "application/json",
+    };
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      );
+
+      final jsonData = jsonDecode(response.body);
+      return {
+        "exists": jsonData["status"].toString() == "true",
+        "data": jsonData["data"]
+      };
+    } catch (e) {
+      print("Check Line User Error: $e");
+      return {"exists": false, "error": e.toString()};
+    }
+  }
+
+  // Helper method to generate random password for LINE users
+  static String generateRandomPassword() {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = Random.secure();
+    return List.generate(10, (index) => chars[random.nextInt(chars.length)]).join();
+  }
+
+  // Helper method to get device token
+  static Future<String> getDeviceToken() async {
+    // Implement your device token logic here
+    // This could be FCM token or any other device identifier
+    return "dummy_device_token";
+  }
+
+  static Future<bool> deleteProfile() async {
+    print("deleteProfile method started");
+    try {
+      final headers = {
+        "Content-Type": "application/json",
+        "accept": "application/json",
+        "UserToken": prefs.getString(LocalStorage.token).toString()
+      };
+      
+      print("Delete Profile Headers: $headers");
+      print("Delete Profile URL: ${DatabaseApi.deleteUser}");
+      
+      final response = await http.delete(
+        Uri.parse(DatabaseApi.deleteUser),
+        headers: headers,
+      );
+
+      print("Delete Profile Response Status: ${response.statusCode}");
+      print("Delete Profile Response Body: ${response.body}");
+
+      final jsonData = jsonDecode(response.body);
+      
+      if (jsonData["status"].toString() == "true") {
+        print("Profile deletion successful");
+        // Also delete Firebase account if exists
+        try {
+          final user = _auth.currentUser;
+          if (user != null) {
+            print("Deleting Firebase account");
+            await user.delete();
+            print("Firebase account deleted successfully");
+          }
+        } catch (firebaseError) {
+          print("Firebase account deletion error: $firebaseError");
+          // Continue even if Firebase deletion fails
+        }
+        return true;
+      } else {
+        print("Profile deletion failed: ${jsonData["message"]}");
+        showErrorMessage(jsonData["message"].toString(), colorError);
+        return false;
+      }
+    } catch (e) {
+      print("Delete Profile Error: $e");
+      showErrorMessage("Failed to delete profile. Please try again.", colorError);
       return false;
     }
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:yokai_quiz_app/screens/stamps/controller/stamp_controller.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
+import 'package:yokai_quiz_app/util/custom_app_bar.dart';
 import 'package:yokai_quiz_app/util/text_styles.dart';
 import 'package:get/get.dart';
 
@@ -21,19 +22,27 @@ class _StampScreenState extends State<StampScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Row(
-                children: [
-                  SvgPicture.asset('icons/arrowLeft.svg'),
-                  Text(
-                    "Stamps".tr,
-                    style: AppTextStyle.normalBold20.copyWith(color: coral500),
-                  ),
-                ],
-              ),
+            // GestureDetector(
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //   },
+            //   child: Row(
+            //     children: [
+            //       SvgPicture.asset('icons/arrowLeft.svg'),
+            //       Text(
+            //         "Stamps".tr,
+            //         style: AppTextStyle.normalBold20.copyWith(color: coral500),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            CustomAppBar(
+                title: "Stamps",
+                isBackButton: true,
+                isColor: false,
+                onButtonPressed: () {
+                  Navigator.pop(context);
+                }
             ),
             const SizedBox(height: 16),
             Text(

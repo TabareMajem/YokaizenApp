@@ -1,0 +1,12 @@
+{
+  "characters": {
+    "player": {
+      "name": "Player",
+      "sprites": {}
+    },
+    "default": {
+      "name": "Unknown",
+      "sprites": {}
+    }
+  }
+} 

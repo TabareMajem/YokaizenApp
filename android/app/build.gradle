@@ -2,7 +2,8 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id("com.google.gms.google-services") version "4.4.2" apply false
+//    id("com.google.gms.google-services") version "4.4.2" apply false
+    id 'com.google.gms.google-services'
 }
 
 def localProperties = new Properties()
@@ -23,22 +24,65 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
+    compileSdkVersion 35
     namespace "com.yokaizen.app"
-    compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
+
+    aaptOptions {
+        cruncherEnabled = false
+        useNewCruncher = false
+        noCompress "tflite"
+        ignoreAssetsPattern "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~"
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    packagingOptions {
+        exclude 'META-INF/*.kotlin_module'
+        // Keep LINE SDK libraries (no longer excluded)
+    }
+
+    // Override the minSdk for uni_links only
+    configurations.all {
+        resolutionStrategy {
+            eachDependency { details ->
+                if (details.requested.group == 'name.avioli.unilinks' ||
+                        details.requested.name == 'uni_links') {
+                    details.useTarget("androidx.core:core:1.9.0")
+                }
+            }
+        }
+    }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += [
+                '-Xskip-metadata-version-check'
+        ]
     }
+
+//    kotlinOptions {
+////        jvmTarget = '1.8'
+//        jvmTarget = '17'
+//    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
     }
 
     defaultConfig {
@@ -47,21 +91,42 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 27
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
-        //   manifestPlaceholders = [
-        //     'line_channel_id': '2006749396'
-        // ]
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
     }
 
     buildTypes {
         release {
-           
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Ensure R8 optimization is enabled
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            renderscriptOptimLevel 3
+            zipAlignEnabled true
+        }
+        
+        debug {
+            // No minification for debug builds
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
         }
     }
 }
@@ -71,6 +136,39 @@ flutter {
 }
 
 dependencies {
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.google.gms:google-services:4.4.2'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.google.android.gms:play-services-safetynet:17.0.1'
+    implementation "androidx.browser:browser:1.4.0"
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    
+    // Colmi Ring SDK
+    implementation files('libs/qc_sdk.aar')
+    
+    // Fix Play Core library conflict - comment out the Play Core dependency
+    // implementation('com.google.android.play:core:1.10.3') {
+    //    exclude group: 'com.google.android.play', module: 'core-common'
+    // }
+    
+    // Explicitly exclude problematic module from all Firebase dependencies
+    implementation('com.google.firebase:firebase-auth') {
+        exclude group: 'com.google.android.play', module: 'core-common'
+    }
+    
+    implementation('com.google.firebase:firebase-auth-ktx') {
+        exclude group: 'com.google.android.play', module: 'core-common'
+    }
+    
+    // Force Google Play Core library exclusion for all configurations
+    configurations.all {
+        exclude group: 'com.google.android.play', module: 'core'
+        exclude group: 'com.google.android.play', module: 'core-common'
+    }
+
+    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.activity:activity-ktx:1.7.0'
+    implementation 'androidx.fragment:fragment-ktx:1.5.7'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
 }

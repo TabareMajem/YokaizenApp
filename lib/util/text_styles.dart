@@ -358,6 +358,12 @@ class AppTextStyle {
     color: AppColors.black,
     fontFamily: 'Montserrat',
   );
+  static const TextStyle normalBold17 = TextStyle(
+    fontSize: 17,
+    fontWeight: FontWeight.bold,
+    color: AppColors.black,
+    fontFamily: 'Montserrat',
+  );
   static const TextStyle normalBold22 = TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.bold,

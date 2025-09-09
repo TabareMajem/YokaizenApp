@@ -58,7 +58,7 @@ class Datum {
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         discription: constants.deviceLanguage == "en"
-            ? json["discription"]
+            ? json["description"]
             : fixEncoding(json["japanese_description"]),
         name: constants.deviceLanguage == "en"
             ? json["name"]

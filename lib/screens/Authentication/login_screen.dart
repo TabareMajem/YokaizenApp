@@ -1,3 +1,5 @@
+/// login_screen.dart
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,20 +7,24 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:yokai_quiz_app/Widgets/new_button.dart';
 import 'package:yokai_quiz_app/Widgets/progressHud.dart';
-import 'package:yokai_quiz_app/screens/Create Account/CreateAccount_screen.dart';
 import 'package:yokai_quiz_app/util/const.dart';
 import 'package:yokai_quiz_app/util/constants.dart';
+import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 
 import '../../Widgets/textfield.dart';
+import '../../api/local_storage.dart';
+import '../../config/app_tracking_config.dart';
 import '../../global.dart';
+import '../../main.dart';
 import '../../util/colors.dart';
 import '../../util/text_styles.dart';
+import '../create_account/create_account_screen.dart';
 import '../navigation/view/navigation.dart';
 import 'controller/auth_screen_controller.dart';
 import 'forgotpassword_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -34,12 +40,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    AppTrackingConfig.initPlugin();
     // WidgetsBinding.instance!.addPostFrameCallback((_) {
     //   c.emailController.value.clear();
     //   c.passwordController.value.clear();
     //   c.isLogin(false);
     // });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +59,13 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading: loading.value,
         child: Scaffold(
           backgroundColor: Colors.white,
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width / 20,
-              ),
-              child: Form(
-                key: _formKey,
+          body: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width / 20,
+            ),
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -66,12 +74,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: EdgeInsets.only(
                             left: screenWidth / 3.5,
                             right: screenWidth / 3.5,
-                            top: screenHeight / 8),
-                        child: Image.asset('images/appLogo_yokai.png'),
+                            top: screenHeight / 15),
+                        child: Image.asset('images/appLogo_yokai.png', height: 90, width: 90,),
                       ),
                     ),
                     SizedBox(
-                      height: screenHeight / 18,
+                      height: screenHeight / 40,
                     ),
                     Center(
                       child: Text(
@@ -100,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         validateEmail(p0);
                       },
                       controller: emailController,
-                      height: 50,
+                      height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
                         border: Border.all(color: greyborder),
@@ -110,19 +118,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: InputBorder.none,
                     ),
                     if (_errorTextEmail != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 20,
-                          top: 3,
-                        ),
-                        child: Text(
-                          _errorTextEmail!,
-                          style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 10,
-                              fontFamily: "Montserrat"),
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(
+                      //     left: 20,
+                      //     top: 3,
+                      //   ),
+                      //   child: Text(
+                      //     _errorTextEmail!,
+                      //     style: const TextStyle(
+                      //         color: Colors.red,
+                      //         fontSize: 10,
+                      //         fontFamily: "Montserrat"),
+                      //   ),
+                      // ),
                     2.5.ph,
                     Text(
                       'Password'.tr,
@@ -150,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       textAlignVertical: TextAlignVertical.center,
                       controller: passwordController,
-                      height: 50,
+                      height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
                         border: Border.all(color: greyborder),
@@ -336,6 +344,58 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     2.ph,
 
+                    // LINE Login Button
+                    // Container(
+                    //   width: double.infinity,
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.circular(50),
+                    //     border: Border.all(
+                    //       color: colorBorder,
+                    //     ),
+                    //   ),
+                    //   child: Material(
+                    //     color: AppColors.white,
+                    //     borderRadius: BorderRadius.circular(50),
+                    //     clipBehavior: Clip.antiAlias,
+                    //     child: InkWell(
+                    //       onTap: _handleLineLogin,
+                    //       splashColor: headingOrange,
+                    //       borderRadius: BorderRadius.circular(50),
+                    //       child: Container(
+                    //         height: 48,
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.center,
+                    //           children: [
+                    //             Padding(
+                    //               padding: const EdgeInsets.only(left: 10),
+                    //               child: Image.asset(
+                    //                 'images/line_logo.png',
+                    //                 width: 30,
+                    //                 height: 30,
+                    //               ),
+                    //             ),
+                    //             1.pw,
+                    //             Text(
+                    //               "Join with Line".tr,
+                    //               textAlign: TextAlign.center,
+                    //               style: const TextStyle(
+                    //                 // color: primaryColor,
+                    //                 color: ironColor,
+                    //                 fontSize: 18,
+                    //                 fontFamily: 'Montserrat',
+                    //                 fontWeight: FontWeight.w700,
+                    //                 letterSpacing: 0.18,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+
+                    2.ph,
+
                     //google login/signing
                     Container(
                       width: double.infinity,
@@ -359,70 +419,102 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: InkWell(
                           onTap: () async {
                             loading(true);
-                            await AuthScreenController.signInWithGoogle()
-                                .then((value) async {
-                              await AuthScreenController.checkEmail(
-                                      AuthScreenController.googleEmail.value)
-                                  .then((value) async {
-                                if (AuthScreenController.isCheckEmail.isTrue) {
-                                  print("Google :: Login");
-                                  final body = {
-                                    "email":
-                                        AuthScreenController.googleEmail.value,
-                                    "password":
-                                        AuthScreenController.googleUid.value
-                                  };
-                                  await AuthScreenController.login(
-                                          context, body)
-                                      .then((value) {
-                                    nextPage(NavigationPage());
-                                    loading(false);
-                                  });
-                                } else {
-                                  print("Google :: SignUp");
-                                  final body = {
-                                    if (AuthScreenController
-                                        .googleName.isNotEmpty)
-                                      "name":
-                                          AuthScreenController.googleName.value,
-                                    if (AuthScreenController
-                                        .googleEmail.isNotEmpty)
-                                      "email": AuthScreenController
-                                          .googleEmail.value,
-                                    if (AuthScreenController
-                                        .googleUid.isNotEmpty)
-                                      "password":
-                                          AuthScreenController.googleUid.value,
-                                    if (AuthScreenController
-                                        .googlePhoneNumber.isNotEmpty)
-                                      "phone_number": AuthScreenController
-                                          .googlePhoneNumber.value,
-                                    "login_type": "1"
-                                  };
-                                  await AuthScreenController.createAccount(
-                                          context, body)
-                                      .then((value) async {
-                                    final body = {
-                                      "email": AuthScreenController
-                                          .googleEmail.value,
-                                      "password":
-                                          AuthScreenController.googleUid.value
-                                    };
-                                    await AuthScreenController.login(
-                                            context, body)
-                                        .then((value) {
-                                      nextPage(NavigationPage());
-                                      loading(false);
-                                    });
-                                  });
+                            try {
+                              print("Initiating Google Sign-In process");
+                              final result = await AuthScreenController.signInWithGoogle(context);
+                              
+                              if (result["success"] == true) {
+                                print("Google Sign-In successful, checking email");
+                                
+                                if (AuthScreenController.googleEmail.value.isEmpty) {
+                                  print("Error: Google email is empty after successful sign-in");
+                                  showErrorMessage("Failed to get email from Google", colorError);
+                                  loading(false);
+                                  return;
                                 }
-                              });
-                            });
+                                
+                                await AuthScreenController.checkEmail(AuthScreenController.googleEmail.value)
+                                    .then((value) async {
+                                  if (AuthScreenController.isCheckEmail.isTrue) {
+                                    print("Email exists, proceeding with login");
+                                    final body = {
+                                      "email": AuthScreenController.googleEmail.value,
+                                      "password": AuthScreenController.googleUid.value
+                                    };
+                                    
+                                    try {
+                                      bool loginSuccess = await AuthScreenController.login(context, body);
+                                      if (loginSuccess) {
+                                        print("Login successful, initiating node login");
+                                        await AuthScreenController.nodeLoginGoogle(context);
+                                        nextPage(NavigationPage());
+                                      } else {
+                                        print("Login failed");
+                                        showErrorMessage("Login failed", colorError);
+                                      }
+                                    } catch (e) {
+                                      print("Error during login: $e");
+                                      showErrorMessage("Error during login: $e", colorError);
+                                    }
+                                  } else {
+                                    print("Email doesn't exist, proceeding with signup");
+                                    final body = {
+                                      if (AuthScreenController.googleName.isNotEmpty)
+                                        "name": AuthScreenController.googleName.value,
+                                      if (AuthScreenController.googleEmail.isNotEmpty)
+                                        "email": AuthScreenController.googleEmail.value,
+                                      if (AuthScreenController.googleUid.isNotEmpty)
+                                        "password": AuthScreenController.googleUid.value,
+                                      if (AuthScreenController.googlePhoneNumber.isNotEmpty)
+                                        "phone_number": AuthScreenController.googlePhoneNumber.value,
+                                      "login_type": "google"
+                                    };
+
+                                    try {
+                                      bool signupSuccess = await AuthScreenController.createAccount(context, body);
+                                      if (signupSuccess) {
+                                        final loginBody = {
+                                          "email": AuthScreenController.googleEmail.value,
+                                          "password": AuthScreenController.googleUid.value
+                                        };
+                                        
+                                        bool loginSuccess = await AuthScreenController.login(context, loginBody);
+                                        if (loginSuccess) {
+                                          print("Login after signup successful");
+                                          await AuthScreenController.nodeLoginGoogle(context);
+                                          nextPage(NavigationPage());
+                                        } else {
+                                          print("Login after signup failed");
+                                          showErrorMessage("Login failed after account creation", colorError);
+                                        }
+                                      } else {
+                                        print("Signup failed");
+                                        showErrorMessage("Account creation failed", colorError);
+                                      }
+                                    } catch (e) {
+                                      print("Error during signup: $e");
+                                      showErrorMessage("Error during signup: $e", colorError);
+                                    }
+                                  }
+                                }).catchError((error) {
+                                  print("Error checking email: $error");
+                                  showErrorMessage("Error checking email: $error", colorError);
+                                });
+                              } else {
+                                print("Google Sign-In failed: ${result["message"]}");
+                                showErrorMessage("Google Sign-In failed: ${result["message"]}", colorError);
+                              }
+                            } catch (e) {
+                              print("Exception in Google Sign-In flow: $e");
+                              showErrorMessage("Error during Google Sign-In: $e", colorError);
+                            } finally {
+                              loading(false);
+                            }
                           },
                           splashColor: headingOrange,
                           borderRadius: BorderRadius.circular(50),
                           child: Container(
-                            height: 48,
+                            height: 40,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -430,8 +522,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Image.asset(
                                     'images/google.png',
-                                    width: 30,
-                                    height: 30,
+                                    width: 23,
+                                    height: 23,
                                   ),
                                 ),
                                 1.pw,
@@ -441,7 +533,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: const TextStyle(
                                     // color: primaryColor,
                                     color: ironColor,
-                                    fontSize: 18,
+                                    fontSize: 17,
                                     fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.18,
@@ -476,33 +568,101 @@ class _LoginScreenState extends State<LoginScreen> {
                           clipBehavior: Clip.antiAlias,
                           child: InkWell(
                             onTap: () async {
-                              AuthScreenController.signInWithApple()
-                                  .then((value) {
+                              try {
                                 loading(true);
-                                print(
-                                    "appleEmail :: ${AuthScreenController.appleEmail.value}");
-                                AuthScreenController.checkEmail(
-                                        AuthScreenController.appleEmail.value)
-                                    .then((value) {
-                                  if (AuthScreenController
-                                      .isCheckEmail.isTrue) {
+                                await AuthScreenController.signInWithApple();
+                                
+                                print("appleEmail :: ${AuthScreenController.appleEmail.value}");
+                                print("appleName :: ${AuthScreenController.appleName.value}");
+                                print("appleUid :: ${AuthScreenController.appleUid.value}");
+                                
+                                // Check if we have at least UID (essential for authentication)
+                                if (AuthScreenController.appleUid.value.isEmpty) {
+                                  loading(false);
+                                  Get.snackbar(
+                                    "Error".tr,
+                                    "Apple Sign-In failed. Please try again.".tr,
+                                    backgroundColor: colorError,
+                                    colorText: Colors.white,
+                                  );
+                                  return;
+                                }
+                                
+                                // Handle case where email is not provided (normal for subsequent Apple Sign-Ins)
+                                String emailToCheck = AuthScreenController.appleEmail.value;
+                                if (emailToCheck.isEmpty) {
+                                  print("No email provided by Apple (normal for subsequent sign-ins)");
+                                  print("Attempting to find existing account by Apple UID: ${AuthScreenController.appleUid.value}");
+                                  
+                                  // Try to login first using Apple UID as this might be a returning user
+                                  try {
+                                    final nodeSuccess = await AuthScreenController.nodeLoginApple(context);
+                                    if (nodeSuccess) {
+                                      loading(false);
+                                      Get.offAll(() => NavigationPage(index: 0));
+                                      return;
+                                    }
+                                  } catch (e) {
+                                    print("Node login failed, will try creating account: $e");
+                                  }
+                                  
+                                  // If login failed, this might be a new user, so create account
+                                  final body = {
+                                    if (AuthScreenController.appleName.isNotEmpty)
+                                      "name": AuthScreenController.appleName.value ?? ' ',
+                                    if (AuthScreenController.appleUid.isNotEmpty)
+                                      "password": AuthScreenController.appleUid.value,
+                                    "login_type": "apple",
+                                    "apple_uid": AuthScreenController.appleUid.value,
+                                  };
+                                  
+                                  print("Creating Apple account without email, body: $body");
+                                  
+                                  try {
+                                    final success = await AuthScreenController.createAccount(context, body);
+                                    if (success) {
+                                      final nodeSuccess = await AuthScreenController.nodeLoginApple(context);
+                                      if (nodeSuccess) {
+                                        loading(false);
+                                        Get.offAll(() => NavigationPage(index: 0));
+                                      } else {
+                                        loading(false);
+                                        Get.snackbar(
+                                          "Error".tr,
+                                          "Account created but login failed. Please try logging in manually.".tr,
+                                          backgroundColor: colorError,
+                                          colorText: Colors.white,
+                                        );
+                                      }
+                                    } else {
+                                      loading(false);
+                                    }
+                                  } catch (e) {
+                                    loading(false);
+                                    Get.snackbar(
+                                      "Error".tr,
+                                      "Account creation failed: ${e.toString()}".tr,
+                                      backgroundColor: colorError,
+                                      colorText: Colors.white,
+                                    );
+                                  }
+                                  return;
+                                }
+                                
+                                // If we have email, proceed with normal flow
+                                AuthScreenController.checkEmail(emailToCheck).then((value) {
+                                  if (AuthScreenController.isCheckEmail.isTrue) {
                                     print("Apple :: Login");
                                     final body = {
-                                      "email":
-                                          AuthScreenController.appleEmail.value,
-                                      "password":
-                                          AuthScreenController.appleUid.value
+                                      "email": AuthScreenController.appleEmail.value,
+                                      "password": AuthScreenController.appleUid.value
                                     };
-                                    if (AuthScreenController
-                                        .appleEmail.isNotEmpty) {
-                                      AuthScreenController.login(context, body)
-                                          .then((value) {
+                                    
+                                    if (AuthScreenController.appleEmail.isNotEmpty) {
+                                      AuthScreenController.login(context, body).then((value) {
                                         if (value) {
-                                          // nextPage(NavigationPage());
-                                          Get.to(() => NavigationPage(),
-                                              transition:
-                                                  Transition.rightToLeft);
-
+                                          AuthScreenController.nodeLoginApple(context);
+                                          Get.to(() => NavigationPage(), transition: Transition.rightToLeft);
                                           loading(false);
                                         } else {
                                           loading(false);
@@ -510,66 +670,56 @@ class _LoginScreenState extends State<LoginScreen> {
                                       });
                                     } else {
                                       loading(false);
-                                      return;
                                     }
                                   } else {
                                     print("Apple :: SignUp");
                                     final body = {
-                                      if (AuthScreenController
-                                          .appleName.isNotEmpty)
-                                        "name": AuthScreenController
-                                            .appleName.value,
-                                      if (AuthScreenController
-                                          .appleEmail.isNotEmpty)
-                                        "email": AuthScreenController
-                                            .appleEmail.value,
-                                      if (AuthScreenController
-                                          .appleUid.isNotEmpty)
-                                        "password":
-                                            AuthScreenController.appleUid.value,
-                                      if (AuthScreenController
-                                          .applePhoneNumber.isNotEmpty)
-                                        "phone_number": AuthScreenController
-                                            .applePhoneNumber.value,
-                                      "login_type": "2"
+                                      if (AuthScreenController.appleName.isNotEmpty)
+                                        "name": AuthScreenController.appleName.value,
+                                      if (AuthScreenController.appleEmail.isNotEmpty)
+                                        "email": AuthScreenController.appleEmail.value,
+                                      if (AuthScreenController.appleUid.isNotEmpty)
+                                        "password": AuthScreenController.appleUid.value,
+                                      "login_type": "apple"
                                     };
-                                    if (AuthScreenController
-                                        .appleEmail.isNotEmpty) {
-                                      AuthScreenController.createAccount(
-                                              context, body)
-                                          .then((value) {
-                                        final body = {
-                                          "email": AuthScreenController
-                                              .appleEmail.value,
-                                          "password": AuthScreenController
-                                              .appleUid.value
-                                        };
-                                        AuthScreenController.login(
-                                                context, body)
-                                            .then((value) {
-                                          if (value) {
-                                            // nextPage(NavigationPage());
-                                            Get.to(() => NavigationPage(),
-                                                transition:
-                                                    Transition.rightToLeft);
-                                            loading(false);
-                                          } else {
-                                            loading(false);
-                                          }
-                                        });
-                                      });
-                                    } else {
-                                      loading(false);
-                                      return;
-                                    }
+                                    print("Apple signup with email, body: $body");
+                                    
+                                    AuthScreenController.createAccount(context, body).then((value) {
+                                      if (value) {
+                                        AuthScreenController.nodeLoginApple(context);
+                                        Get.to(() => NavigationPage(), transition: Transition.rightToLeft);
+                                        loading(false);
+                                      } else {
+                                        loading(false);
+                                      }
+                                    });
                                   }
+                                }).catchError((error) {
+                                  loading(false);
+                                  print("Email check error: $error");
+                                  Get.snackbar(
+                                    "Error".tr,
+                                    "Failed to verify email. Please check your internet connection.".tr,
+                                    backgroundColor: colorError,
+                                    colorText: Colors.white,
+                                  );
                                 });
-                              });
+                                
+                              } catch (e) {
+                                loading(false);
+                                print("Apple Sign-In error: $e");
+                                Get.snackbar(
+                                  "Error".tr,
+                                  e.toString().replaceAll('Exception: ', ''),
+                                  backgroundColor: colorError,
+                                  colorText: Colors.white,
+                                );
+                              }
                             },
                             splashColor: headingOrange,
                             borderRadius: BorderRadius.circular(50),
                             child: Container(
-                              height: 48,
+                              height: 40,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -577,8 +727,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     padding: const EdgeInsets.only(left: 10),
                                     child: Image.asset(
                                       'images/apple.png',
-                                      width: 30,
-                                      height: 30,
+                                      width: 23,
+                                      height: 23,
                                     ),
                                   ),
                                   1.pw,
@@ -588,7 +738,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     style: const TextStyle(
                                       // color: primaryColor,
                                       color: ironColor,
-                                      fontSize: 18,
+                                      fontSize: 17,
                                       fontFamily: 'Montserrat',
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 0.18,
@@ -646,6 +796,114 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _errorTextpass = null;
       });
+    }
+  }
+
+  Future<void> _handleLineLogin() async {
+    try {
+      final result = await LineSDK.instance.login(
+          scopes: ['profile', 'openid', 'email']
+      ).then((value) {
+        print("_handleLineLogin login value : ${value.data}");
+        final profile = value.userProfile!;
+        String email = "${profile.userId}@yokailine.com";
+        String password = profile.userId.trim();
+        String name = profile.displayName.trim();
+        String phoneNumber = profile.displayName.trim().replaceAll(RegExp(r'[^0-9]'), '').substring(0, 10);
+
+        final body = {
+          "name": name,
+          "email": email,
+          "password": password,
+          "phone_number": phoneNumber,
+          "login_type": "user"
+        };
+
+        print("_handleLineLogin got invoked and received the response body : $body");
+
+        // AuthScreenController.signUpWithFirebase(context, email, password).then((value) {
+        //     if (value) {
+        //       AuthScreenController.createAccount(
+        //           context, body)
+        //           .then((value) {
+        //         final bodyData = {
+        //           "name": name,
+        //           "displayName": name,
+        //           "yokaiName": name,
+        //           "email": email,
+        //           "password": password,
+        //           "phoneNumber": phoneNumber,
+        //           "loginType": "email"
+        //         };
+        //         AuthScreenController.nodeCreateAccount(context, bodyData).then((value) {});
+        //
+        //         final body = {
+        //           "email": email,
+        //           "password": password
+        //         };
+        //
+        //         if (value) {
+        //           AuthScreenController.login(context, body)
+        //               .then((value) {
+        //             if (value) {
+        //               prefs.setString(LocalStorage.email, email);
+        //               prefs.setString(LocalStorage.username, name);
+        //               prefs.setString(LocalStorage.phonenumber, phoneNumber);
+        //               nextPage(
+        //                 ConfirmationScreen(
+        //                   title: 'Account Created!'.tr,
+        //                   message:
+        //                   // 'We've sent you an email to confirm the details of your account.',
+        //                   '',
+        //                   buttonText: 'Start Reading'.tr,
+        //                 ),
+        //               );
+        //               loading(false);
+        //             } else {
+        //               loading(false);
+        //             }
+        //           });
+        //         } else {
+        //           loading(false);
+        //         }
+        //       });
+        //     } else {
+        //       showErrorMessage(
+        //           "Something went wrong".tr, colorError);
+        //       loading(false);
+        //     }
+        //   },
+        // );
+        //
+
+      },);
+
+      print("_handleLineLogin result data : ${result.data}"
+          "\nresult userProfile : ${result.userProfile}");
+
+      if (result.userProfile != null) {
+        final profile = result.userProfile!;
+        final body = {
+          // "email": profile.email ?? '',
+          "name": profile.displayName,
+          "line_id": profile.userId,
+          "avatar": profile.pictureUrl ?? '',
+          "email" : profile.userId
+        };
+
+        print("_handleLineLogin got invoked line credentials body : ${body}"
+            "\nand profile data : ${profile.data}");
+
+        // Call your backend API to create/login user
+        await AuthScreenController.handleLineLogin(context, body);
+      }
+    } catch (e) {
+      print('Line Login Error: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to login with LINE',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }

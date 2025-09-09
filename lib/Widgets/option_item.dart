@@ -3,15 +3,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:yokai_quiz_app/Widgets/confirmation_box.dart';
 import 'package:yokai_quiz_app/main.dart';
-import 'package:yokai_quiz_app/screens/About%20us/about_page.dart';
+import 'package:yokai_quiz_app/screens/about_us/about_page.dart';
 import 'package:yokai_quiz_app/screens/Authentication/controller/auth_screen_controller.dart';
 import 'package:yokai_quiz_app/screens/Authentication/login_screen.dart';
 import 'package:yokai_quiz_app/screens/FAQ/faq_page.dart';
-import 'package:yokai_quiz_app/screens/Refer%20and%20Earn/view/refer_and_earn.dart';
+import 'package:yokai_quiz_app/screens/refer_and_earn/view/refer_and_earn.dart';
 import 'package:yokai_quiz_app/screens/Settings/view/account_info.dart';
 import 'package:yokai_quiz_app/screens/Settings/view/notification_page.dart';
 import 'package:yokai_quiz_app/screens/Settings/view/privacy_page.dart';
-import 'package:yokai_quiz_app/screens/connected%20devices/view/connected_devices.dart';
+import 'package:yokai_quiz_app/screens/connected_devices/view/connected_devices.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
 import 'package:yokai_quiz_app/util/text_styles.dart';
@@ -131,6 +131,12 @@ class _SettingScreenState extends State<SettingScreen> {
                     "1") &&
                 ((AuthScreenController.getProfileModel.value.user?.loginType ??
                         '') !=
+                    "2"))
+            if (((AuthScreenController.getProfileModel.value.user?.loginType ??
+                '') !=
+                "1") &&
+                ((AuthScreenController.getProfileModel.value.user?.loginType ??
+                    '') !=
                     "2"))
               4.ph,
             Padding(

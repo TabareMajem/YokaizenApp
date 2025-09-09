@@ -52,7 +52,7 @@ class _CustomInfoFieldState extends State<CustomInfoField> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double padding = screenWidth > 600 ? 24 : 14;
+    // double padding = screenWidth > 600 ? 24 : 14;
     double fontSize = screenWidth > 600 ? 18 : 16;
     double hintFontSize = screenWidth > 600 ? 18 : 16;
 

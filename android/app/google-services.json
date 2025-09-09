@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "543257928924",
     "project_id": "yokaizen-43f63",
-    "storage_bucket": "yokaizen-43f63.appspot.com"
+    "storage_bucket": "yokaizen-43f63.firebasestorage.app"
   },
   "client": [
     {
@@ -14,40 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "543257928924-i4o2ahdgftkb684eb61dlm65c9a85f4h.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBOcdRS_-X1dOZahOgdkJdPWxf12SAn_sA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "543257928924-i4o2ahdgftkb684eb61dlm65c9a85f4h.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:543257928924:android:b374bd4fc856d39e08c019",
-        "android_client_info": {
-          "package_name": "com.yokaizen.app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "543257928924-5184v97t4ilgnbjpnt6n82aojdf6rsqj.apps.googleusercontent.com",
+          "client_id": "543257928924-kd5cquak6grd5v6e2kd1slmmgpnstmvn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.yokaizen.app",
-            "certificate_hash": "df905ee56e46a36d4b2d4964d21051b823d4efc5"
+            "package_name": "com.yokai.app",
+            "certificate_hash": "17a02c36efe659e8723eb331fb766adc77cfe837"
           }
         },
         {
@@ -66,6 +37,89 @@
             {
               "client_id": "543257928924-i4o2ahdgftkb684eb61dlm65c9a85f4h.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "543257928924-arjavjrr75g92c97sko40a8ce7ohv8a0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yokaiquizzen.yokaiquizApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543257928924:android:b374bd4fc856d39e08c019",
+        "android_client_info": {
+          "package_name": "com.yokaizen.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "543257928924-2et3je2afqftjpam5tgtvj6nl6gaec4c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yokaizen.app",
+            "certificate_hash": "c601fa8b5ce7587d7691d1559f6d62b73601800c"
+          }
+        },
+        {
+          "client_id": "543257928924-5184v97t4ilgnbjpnt6n82aojdf6rsqj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yokaizen.app",
+            "certificate_hash": "df905ee56e46a36d4b2d4964d21051b823d4efc5"
+          }
+        },
+        {
+          "client_id": "543257928924-e05oseloprk68o2avrrer3n3o7tqrlgm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yokaizen.app",
+            "certificate_hash": "17a02c36efe659e8723eb331fb766adc77cfe837"
+          }
+        },
+        {
+          "client_id": "543257928924-fapt6gui9f09n6t570rvqei1miqnr7dn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yokaizen.app",
+            "certificate_hash": "cbb4b437643f45997ccbd929b44529bf0f686f34"
+          }
+        },
+        {
+          "client_id": "543257928924-iejjoio4pqpb2oj0g2rc33b66nnn5343.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yokaizen.app",
+            "certificate_hash": "16fe260731bf4852ba8ca87148b27471ff0f6dcd"
+          }
+        },
+        {
+          "client_id": "543257928924-i4o2ahdgftkb684eb61dlm65c9a85f4h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOcdRS_-X1dOZahOgdkJdPWxf12SAn_sA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "543257928924-i4o2ahdgftkb684eb61dlm65c9a85f4h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "543257928924-arjavjrr75g92c97sko40a8ce7ohv8a0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yokaiquizzen.yokaiquizApp"
+              }
             }
           ]
         }

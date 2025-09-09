@@ -1,0 +1,42 @@
+{
+  "effects": {
+    "artifact_glow": {
+      "sprite": "effects/artifact_glow.png",
+      "sound": "sfx/effects/artifact_glow.mp3",
+      "animation": {
+        "type": "pulse",
+        "duration": 2000,
+        "intensity": 1.5,
+        "repeat": 3,
+        "fadeOut": true
+      },
+      "particles": {
+        "enabled": true,
+        "count": 50,
+        "lifetime": 1000,
+        "color": "#3A7BF7"
+      }
+    },
+    "time_shard_glow": {
+      "sprite": "effects/time_shard_glow.png",
+      "sound": "sfx/effects/time_shard.mp3",
+      "animation": {
+        "type": "wave",
+        "duration": 3000,
+        "intensity": 2.0,
+        "repeat": 1,
+        "fadeOut": true
+      }
+    },
+    "mirror_reveal": {
+      "sprite": "effects/mirror_reveal.png",
+      "sound": "sfx/effects/mirror_reveal.mp3",
+      "animation": {
+        "type": "fade",
+        "duration": 2500,
+        "intensity": 1.8,
+        "fadeOut": true
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Cute round fox head -->
+    <circle cx="12" cy="12" r="8" stroke="#540375" stroke-width="1.5" fill="none"/>
+
+    <!-- Adorable pointy ears -->
+    <path d="M8 6C8 4 9 3 10 4C11 3 12 4 12 6" stroke="#540375" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M12 6C12 4 13 3 14 4C15 3 16 4 16 6" stroke="#540375" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Inner ears for extra cuteness -->
+    <path d="M9 5.5C9.5 5 10 5 10.5 5.5" stroke="#540375" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M13.5 5.5C14 5 14.5 5 15 5.5" stroke="#540375" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Big kawaii eyes -->
+    <circle cx="9.5" cy="10.5" r="1.5" stroke="#540375" stroke-width="1.5" fill="none"/>
+    <circle cx="14.5" cy="10.5" r="1.5" stroke="#540375" stroke-width="1.5" fill="none"/>
+
+    <!-- Eye sparkles for extra cuteness -->
+    <circle cx="9.8" cy="10.2" r="0.3" fill="#540375"/>
+    <circle cx="14.8" cy="10.2" r="0.3" fill="#540375"/>
+
+    <!-- Tiny cute nose -->
+    <path d="M11.7 13L12 13.5L12.3 13" stroke="#540375" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Sweet little smile -->
+    <path d="M10.5 15C11 15.5 12 15.5 12 15.5C12 15.5 13 15.5 13.5 15" stroke="#540375" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Cute cheek blushes -->
+    <circle cx="7" cy="13" r="1" stroke="#540375" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <circle cx="17" cy="13" r="1" stroke="#540375" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+    <!-- Fluffy tail -->
+    <path d="M18 15C19 16 20 18 20 20C19.5 21 18 20.5 17 19C16 17.5 17 16 18 15Z" stroke="#540375" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Extra fluffy tail tip -->
+    <circle cx="19.5" cy="19.5" r="1" stroke="#540375" stroke-width="1.5" fill="none"/>
+
+    <!-- Cute little paws -->
+    <ellipse cx="8" cy="19" rx="1.5" ry="0.8" stroke="#540375" stroke-width="1.5" fill="none"/>
+    <ellipse cx="16" cy="19" rx="1.5" ry="0.8" stroke="#540375" stroke-width="1.5" fill="none"/>
+
+    <!-- Heart-shaped magical mark on forehead -->
+    <path d="M11 7.5C11 7 11.5 6.5 12 7C12.5 6.5 13 7 13 7.5C13 8 12 9 12 9C12 9 11 8 11 7.5Z" stroke="#540375" stroke-width="1.5" fill="none"/>
+</svg>

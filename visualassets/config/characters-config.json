@@ -1,0 +1,61 @@
+{
+  "characters": {
+    "hana": {
+      "id": "hana",
+      "fullName": "Hana Tanaka",
+      "defaultPosition": "center",
+      "scale": 1.0,
+      "sprites": {
+        "base": "characters/hana/base.png",
+        "expressions": {
+          "neutral": "characters/hana/expressions/neutral.png",
+          "tired": "characters/hana/expressions/tired.png",
+          "worried": "characters/hana/expressions/worried.png",
+          "surprised": "characters/hana/expressions/surprised.png",
+          "nervous": "characters/hana/expressions/nervous.png",
+          "amazed": "characters/hana/expressions/amazed.png"
+        }
+      },
+      "voiceSet": "hana_voice",
+      "defaultExpression": "neutral"
+    },
+    "mei": {
+      "id": "mei",
+      "fullName": "Mei Suzuki",
+      "defaultPosition": "right",
+      "scale": 1.0,
+      "sprites": {
+        "base": "characters/mei/base.png",
+        "expressions": {
+          "neutral": "characters/mei/expressions/neutral.png",
+          "concerned": "characters/mei/expressions/concerned.png",
+          "inspired": "characters/mei/expressions/inspired.png",
+          "sensitive": "characters/mei/expressions/sensitive.png",
+          "creative": "characters/mei/expressions/creative.png",
+          "surprised": "characters/mei/expressions/surprised.png"
+        }
+      },
+      "voiceSet": "mei_voice",
+      "defaultExpression": "neutral"
+    },
+    "yuto": {
+      "id": "yuto",
+      "fullName": "Yuto Nakamura",
+      "defaultPosition": "left",
+      "scale": 1.0,
+      "sprites": {
+        "base": "characters/yuto/base.png",
+        "expressions": {
+          "neutral": "characters/yuto/expressions/neutral.png",
+          "happy": "characters/yuto/expressions/happy.png",
+          "relaxed": "characters/yuto/expressions/relaxed.png",
+          "curious": "characters/yuto/expressions/curious.png",
+          "excited": "characters/yuto/expressions/excited.png",
+          "thoughtful": "characters/yuto/expressions/thoughtful.png"
+        }
+      },
+      "voiceSet": "yuto_voice",
+      "defaultExpression": "neutral"
+    }
+  }
+}

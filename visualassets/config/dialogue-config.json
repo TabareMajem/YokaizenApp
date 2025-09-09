@@ -1,0 +1,29 @@
+{
+  "textSpeed": 30,
+  "autoPlayDelay": 2000,
+  "skipDelay": 50,
+  "ui": {
+    "textBox": {
+      "opacity": 0.85,
+      "fadeTime": 200,
+      "margins": {
+        "horizontal": 40,
+        "vertical": 20
+      }
+    },
+    "nameBox": {
+      "opacity": 0.9,
+      "fadeTime": 150
+    }
+  },
+  "transitions": {
+    "default": {
+      "type": "fade",
+      "duration": 500
+    },
+    "chapter": {
+      "type": "fade",
+      "duration": 1500
+    }
+  }
+}

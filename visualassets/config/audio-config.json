@@ -1,0 +1,61 @@
+{
+  "music": {
+    "school_theme": {
+      "file": "visualassets/audio/music/school_theme.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "fadeIn": 2000,
+      "fadeOut": 1500
+    },
+    "mystery_theme": {
+      "file": "visualassets/audio/music/mystery_theme.mp3",
+      "loop": true,
+      "volume": 0.6,
+      "fadeIn": 2000,
+      "fadeOut": 1500
+    }
+  },
+  "ambient": {
+    "school_morning": {
+      "file": "visualassets/audio/ambient/school_morning.mp3",
+      "loop": true,
+      "volume": 0.3
+    },
+    "classroom": {
+      "file": "visualassets/audio/ambient/classroom.mp3",
+      "loop": true,
+      "volume": 0.25
+    },
+    "storage_room": {
+      "file": "visualassets/audio/ambient/storage_room.mp3",
+      "loop": true,
+      "volume": 0.2
+    }
+  },
+  "sfx": {
+    "ui": {
+      "click": {
+        "file": "visualassets/audio/sfx/ui/click.mp3",
+        "volume": 0.5
+      },
+      "hover": {
+        "file": "visualassets/audio/sfx/ui/hover.mp3",
+        "volume": 0.3
+      }
+    },
+    "effects": {
+      "artifact_glow": {
+        "file": "visualassets/audio/sfx/effects/artifact_glow.mp3",
+        "volume": 0.6
+      },
+      "time_shard": {
+        "file": "visualassets/audio/sfx/effects/time_shard.mp3",
+        "volume": 0.7
+      },
+      "mirror_reveal": {
+        "file": "visualassets/audio/sfx/effects/mirror_reveal.mp3",
+        "volume": 0.65
+      }
+    }
+  }
+}

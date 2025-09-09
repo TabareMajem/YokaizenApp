@@ -168,3 +168,20 @@ const Color navigationBackground = Color(0xFFF7E7FF);
 const Color dateGrey = Color(0xFFA8B1B7);
 const Color queGrey = Color(0xFF757575);
 const Color blueName = Color(0xFF345C72);
+
+// Additional colors for Central Intelligence
+const Color indigo500 = Color(0xFF6366F1);
+const Color purple500 = Color(0xFF8B5CF6);
+const Color green500 = Color(0xFF10B981);
+const Color teal500 = Color(0xFF14B8A6);
+const Color pink500 = Color(0xFFEC4899);
+const Color orange500 = Color(0xFFF59E0B);
+const Color amber500 = Color(0xFFF59E0B);
+
+List<Color> progressColors = const [
+  Color.fromRGBO(240, 125, 17, 1),
+  Color.fromRGBO(255, 95, 129, 1),
+  Color.fromRGBO(36, 184, 116, 1),
+  Color.fromRGBO(255, 199, 0, 1),
+  Colors.blueAccent
+];

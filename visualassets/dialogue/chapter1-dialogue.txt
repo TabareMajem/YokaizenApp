@@ -1,0 +1,38 @@
+title: Chapter1_Start
+---
+<<change_background school_entrance_morning>>
+
+The cherry blossoms dance in the morning breeze as students make their way through Sakura High's entrance. #narration
+
+<<show_character hana neutral center>>
+Hana: Another morning... These AR glasses are acting up again. #emotion: tired
+
+<<wait 1>>
+<<show_character yuto happy right>>
+Yuto: Hey, Hana! Having tech troubles again? #emotion: cheerful
+
+Hana: Yuto! Yeah, they've been glitching since yesterday. #emotion: worried
+
+<<change_background classroom_day>>
+The classroom buzzes with morning energy as students settle into their seats. #narration
+
+<<show_character mei neutral left>>
+Mei: Good morning! Hana, are you okay? Your aura seems... different today. #emotion: concerned
+
+<<hide_character yuto>>
+<<show_character mei happy right>>
+Mei: Oh! I just... I notice things sometimes. The colors around people... #emotion: shy
+
+<<change_background storage_room>>
+Later that day, the group finds themselves in the old storage room... #narration
+
+<<show_character hana worried>>
+Hana: My glasses... they're reacting to something in here. #emotion: nervous
+
+<<show_character mei surprised>>
+Mei: The colors... they're so strong in here! #emotion: amazed
+
+<<play_sound artifact_glow>>
+<<show_effect artifact_glow>>
+<<set $seen_artifact = true>>
+===

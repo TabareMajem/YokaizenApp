@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Yokai Quiz App</string>
+	<string>Yokaizen Manga for Mental Care</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,62 +15,97 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Yokaizen</string>
+	<string>Yokaizen Manga</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>1.0.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>We use your music library to share audio files in chat. Your audio or music file(s) will not be uploaded or shared without your permission.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>We use your camera to set your profile picture. Your photos and videos will not be uploaded or shared without your permission.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-		<string>We use your camera to set your profile picture. Your photos and videos will not be uploaded or shared without your permission</string>
-	<key>NSMicrophoneUsageDescription</key>
-    <string>We use your microphone to record your voice messages and share in chat. Your audio will not be uploaded or shared without your permission.</string>
+
+	<!-- URL Schemes -->
 	<key>CFBundleURLTypes</key>
-<<<<<<< HEAD
-=======
-	
->>>>>>> 5dc99dfe09f9decde44feff7ea34cd7d2d9a97da
 	<array>
+		<!-- LINE Login -->
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>line3rdp.2007003693</string>
+			</array>
+		</dict>
+
+		<!-- Google Sign-In -->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.543257928924-arjavjrr75g92c97sko40a8ce7ohv8a0</string>
 			</array>
 		</dict>
+
+		<!-- App custom scheme -->
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
-			<array/>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array/>
+			<array>
+				<string>com.yokaiquizzen.yokaiquizApp</string>
+			</array>
 		</dict>
 	</array>
+
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>2</string>
+
+	<!-- Encryption -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+
+	<!-- LINE Queries -->
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>lineauth</string>
 		<string>lineauth2</string>
-		<string>line</string>
 	</array>
+
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
+	<!-- Network Security -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+
+	<!-- Permissions -->
+	<key>NSAppleMusicUsageDescription</key>
+	<string>YokaiZen needs access to play sounds for notifications.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>YokaiZen needs camera access to scan QR codes.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>YokaiZen needs microphone access for voice features.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>YokaiZen needs photo library access to upload profile pictures.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This allows us to provide personalized mental fitness recommendations based on your activity.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>We need Bluetooth access to connect to your smart ring.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>We need Bluetooth access to connect to your smart ring.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app requires local network access for debugging and device communication.</string>
+
+	<!-- Bonjour (Dart Debugging) -->
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartobservatory._tcp</string>
+	</array>
+
+	<!-- UI Config -->
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -91,23 +126,24 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 
-	<!--For Line Integration -->
-	<key>CFBundleURLTypes</key>
-<array>
-  <dict>
-    <key>CFBundleTypeRole</key>
-    <string>Editor</string>
-    <key>CFBundleURLSchemes</key>
-    <array>
-      <!-- Specify URL scheme to use when returning from LINE to your app. -->
-      <string>line3rdp.$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-    </array>
-  </dict>
-</array>
-<key>LSApplicationQueriesSchemes</key>
-<array>
-  <!-- Specify URL scheme to use when launching LINE from your app. -->
-  <string>lineauth2</string>
-</array>
+	<!-- Apple Sign In -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+	
+	<!-- Associated Domains for Apple Sign In (if needed) -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:yokaizen.com</string>
+	</array>
+
+	<!-- Background Modes -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+		<string>bluetooth-central</string>
+	</array>
 </dict>
 </plist>

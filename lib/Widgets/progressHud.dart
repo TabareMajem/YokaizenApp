@@ -40,13 +40,17 @@ class ProgressHUD extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const CircularProgressIndicator(),
+                    SizedBox(
+                        child: const CircularProgressIndicator(),
+                      height: 20,
+                      width: 20,
+                    ),
                     const SizedBox(
                       width: constants.defaultPadding,
                     ),
                     Text(
                       "Please wait...".tr,
-                      style: AppTextStyle.normalBold18
+                      style: AppTextStyle.normalBold14
                           .copyWith(color: colorHeadingText),
                     ),
                   ],

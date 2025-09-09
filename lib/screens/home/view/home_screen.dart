@@ -1,32 +1,45 @@
+/// home_screen.dart
+
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chewie/chewie.dart';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_player/video_player.dart';
 import 'package:yokai_quiz_app/Widgets/progressHud.dart';
+import 'package:yokai_quiz_app/config/app_tracking_config.dart';
 import 'package:yokai_quiz_app/screens/Authentication/controller/auth_screen_controller.dart';
-import 'package:yokai_quiz_app/screens/assistance/assistance_screen.dart';
+import 'package:yokai_quiz_app/screens/assistance/view/screens/assistance_screen.dart';
 import 'package:yokai_quiz_app/screens/challenge/controller/challenge_controller.dart';
+import 'package:yokai_quiz_app/screens/games/view/games_screen.dart';
 import 'package:yokai_quiz_app/screens/navigation/view/navigation.dart';
 import 'package:yokai_quiz_app/screens/todo/view/todo_screen.dart';
+import 'package:yokai_quiz_app/services/app_state_manager.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
 import 'package:yokai_quiz_app/util/constants.dart';
 import 'package:yokai_quiz_app/util/text_styles.dart';
+import 'package:yokai_quiz_app/Widgets/skeleton_components.dart';
 import '../../../api/database_api.dart';
 import '../../../api/local_storage.dart';
 import '../../../global.dart';
 import '../../../main.dart';
 import '../../chat/controller/chat_controller.dart';
 import '../../chat/view/characters_details_page.dart';
+import '../../chat/view/messaging_page.dart';
 import '../../read/controller/read_controller.dart';
-import '../../read/view/read_stories_page.dart';
-import '../../read/view/story_open_story_page.dart';
+import '../../read/view/open_story_screen.dart';
+import '../../read/view/read_stories_screen.dart';
+import '../../read/view/story_details_screen.dart';
 import '../controller/home_controller.dart';
+import '../../assistance/view/widgets/yokais_videos.dart';
+import '../../../global.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,16 +49,130 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  RxBool isLoading = false.obs;
+  late AppStateManager appStateManager;
   String deviceId = "Fetching device info...";
   String deviceName = "";
-  String ipAddress = "192.168.0.1";
+    String ipAddress = "192.168.0.1";
+  VideoPlayerController? _videoController;
+  ChewieController? _chewieController;
+  bool _isDisposed = false;
+  bool _isVideoInitialized = false;
+  String? _videoError;
 
   @override
   void initState() {
     super.initState();
-    isLoading(true);
-    fetchData();
+    _initializeOptimizedHome();
+    AppTrackingConfig.initPlugin();
+    if (constants.appYokaiPath != null) {
+      print('Initializing video with path: ${constants.appYokaiPath}');
+      _initializeVideo();
+    }
+  }
+
+  /// Initialize optimized home screen with ULTRA FAST performance (Netflix-style)
+  void _initializeOptimizedHome() {
+    customPrint('🚀 ULTRA FAST: Initializing home screen with Netflix-level performance');
+    
+    // Get the app state manager instance
+    appStateManager = AppStateManager.instance;
+    
+    // Defer state updates to prevent setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      customPrint('⚡ ULTRA FAST: Home screen initialization callback');
+      
+      // Start home screen loading process (now ultra-fast)
+      appStateManager.startHomeScreenLoading();
+      
+      // Load device info asynchronously (non-blocking)
+      if (!appStateManager.hasComponentData('device_info')) {
+        _loadDeviceInfo();
+      }
+    });
+  }
+
+  /// Load device info separately if not prefetched
+  Future<void> _loadDeviceInfo() async {
+    try {
+      await getDeviceInfo();
+      await HomeController.recordDevice(deviceId, deviceName, ipAddress);
+      appStateManager.setComponentData('device_info', {
+        'deviceId': deviceId,
+        'deviceName': deviceName,
+        'ipAddress': ipAddress,
+      });
+    } catch (e) {
+      appStateManager.setComponentError('device_info', e.toString());
+    }
+  }
+
+  Future<void> _initializeVideo() async {
+    if (_isDisposed) return;
+
+    try {
+      // Extract yokai type and emotion from the path
+      final pathParts = constants.appYokaiPath!.split('/');
+      final fileName = pathParts.last;
+      final yokaiType = fileName.split('-')[0]; // e.g., "tanuki", "water", etc.
+      final emotion = fileName.split('-')[1].split('.')[0]; // e.g., "hello"
+
+      // Get the correct video path from videoAssets
+      final videoPath = videoAssets[yokaiType]?[emotion];
+
+      if (videoPath == null) {
+        setState(() {
+          _videoError = 'Video path not found';
+        });
+        return;
+      }
+
+      _videoController = VideoPlayerController.asset(videoPath);
+      await _videoController!.initialize();
+
+      if (!_isDisposed) {
+        _chewieController = ChewieController(
+          videoPlayerController: _videoController!,
+          autoPlay: true,
+          looping: true,
+          showControls: false,
+          aspectRatio: 1, // Force 1:1 aspect ratio for circular shape
+          autoInitialize: true,
+          showControlsOnInitialize: false,
+          allowMuting: true,
+          allowPlaybackSpeedChanging: false,
+          draggableProgressBar: false,
+          zoomAndPan: false,
+        );
+
+        setState(() {
+          _isVideoInitialized = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error initializing video: $e');
+      setState(() {
+        _videoError = e.toString();
+      });
+    }
+  }
+
+  Future<void> _initializeApp() async {
+    try {
+      // Start video preloading first
+      // Then continue with other initialization
+      // Data fetching is now handled by the app state manager during splash
+      // This method is kept for backward compatibility but is largely unused
+    } catch (e) {
+      debugPrint('Error in app initialization: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _videoController?.dispose();
+    _chewieController?.dispose();
+    super.dispose();
   }
 
   String hashString(String input) {
@@ -59,12 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
       await AuthScreenController.fetchData().then((value) async {
         await HomeController.incrementUserLog().then((value) async {
           await ChallengeController.getAllChallenges().then((value) async {
-            await getDeviceInfo().then((value) async {
-              await HomeController.recordDevice(deviceId, deviceName, ipAddress)
-                  .then((value) async {
-                isLoading(false);
-              });
-            });
+                      // Device info loading is now handled by app state manager
+          // This section is kept for backward compatibility
           });
         });
       });
@@ -94,12 +217,62 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _reinitializeVideo() {
+    setState(() {
+      _isVideoInitialized = false;
+      _videoError = null;
+    });
+    _videoController?.dispose();
+    _chewieController?.dispose();
+    if (constants.appYokaiPath != null) {
+      _initializeVideo();
+    }
+  }
+
+  Widget getYokaiGif() {
+    Widget getGifContent(String gifPath) {
+      return Container(
+        height: 50,
+        width: 50,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 2,
+          ),
+        ),
+        child: ClipOval(
+          child: Image.asset(
+            gifPath,
+            height: 50,
+            width: 50,
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+
+    switch (constants.selectedYokai) {
+      case "tanuki":
+        return getGifContent('gif/tanuki1.gif');
+      case "water":
+        return getGifContent('gif/water1.gif');
+      case "spirit":
+        return getGifContent('gif/spirit1.gif');
+      case "purple":
+        return getGifContent('gif/purple1.gif');
+      case "default_yokai":
+      default:
+        return getGifContent('gif/yokai.gif');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Obx(() {
       return ProgressHUD(
-        isLoading: isLoading.value,
+        isLoading: appStateManager.isHomeScreenLoading,
         child: Scaffold(
           backgroundColor: colorWhite,
           body: SingleChildScrollView(
@@ -108,36 +281,20 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // User Profile Section - ORIGINAL
                   Row(
                     children: [
                       Expanded(
                         child: Text(
                           '${"Hi".tr} ${(prefs.getString(LocalStorage.username) != null) ? prefs.getString(LocalStorage.username) : ''}${(prefs.getString(LocalStorage.username) != null) ? '!' : ''}',
-                          style: AppTextStyle.normalBold20
-                              .copyWith(color: headingColour),
+                          style: AppTextStyle.normalBold20.copyWith(color: headingColour),
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
                           Get.to(() => const YokaiAssistanceScreen());
                         },
-                        child: constants.appYokaiPath == null
-                            ? Image.asset(
-                                'images/appLogo_yokai.png',
-                                // color: headingOrange,
-                                height: 50,
-                                width: 50,
-                              )
-                            : Container(
-                                height: 50,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage(constants.appYokaiPath!),
-                                  ),
-                                ),
-                              ),
+                        child: getYokaiGif(),
                       ),
                     ],
                   ),
@@ -153,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if ((ReadController.getAllStoriesBy.value.data?.length ?? 0) >
                       0)
                     SizedBox(
-                      height: screenSize.height / 3.7,
+                      height: screenSize.height / 3.6,
                       child: ListView.builder(
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
@@ -173,12 +330,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ReadController.backToStories(false);
                                 ChallengeController.backToChallenge(true);
                                 ReadController.storyId('');
-                                nextPage(OpenStoryPage(
+                                // nextPage(OpenStoryScreen(
+                                //   storyId: ReadController
+                                //           .getAllStoriesBy.value.data?[index].id
+                                //           .toString() ??
+                                //       '',
+                                // )
+                                nextPage(StoryDetailsScreen(
                                   storyId: ReadController
-                                          .getAllStoriesBy.value.data?[index].id
-                                          .toString() ??
+                                      .getAllStoriesBy.value.data?[index].id
+                                      .toString() ??
                                       '',
-                                ));
+                                )
+                                );
                                 ReadController.storyId(
                                   ReadController
                                           .getAllStoriesBy.value.data?[index].id
@@ -277,59 +441,185 @@ class _HomeScreenState extends State<HomeScreen> {
                   ChallengeController.getChallengeAll.value.data == null
                       ? const SizedBox()
                       : SizedBox(
-                          height: screenSize.height / 14,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: ChallengeController
-                                .getChallengeAll.value.data!.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          NavigationPage(index: 3),
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 20),
-                                  child: Container(
-                                    height: screenSize.height / 10,
-                                    width: screenSize.width / 2.8,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(6),
-                                      color: AppColors.white,
-                                      border:
-                                          Border.all(color: indigo50, width: 2),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          "${DatabaseApi.mainUrlImage}${ChallengeController.getChallengeAll.value.data![index].image!}",
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        ChallengeController.getChallengeAll
-                                            .value.data![index].name!,
-                                        maxLines: 1,
-                                        style:
-                                            AppTextStyle.normalBold12.copyWith(
-                                          color: AppColors.black,
-                                        ),
+                    height: screenSize.height / 14,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: ChallengeController.getChallengeAll.value.data!.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NavigationPage(index: 3),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                              height: screenSize.height / 10,
+                              width: screenSize.width / 2.8,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.white,
+                                border: Border.all(color: indigo50, width: 2),
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    "${DatabaseApi.mainUrlImage}${ChallengeController.getChallengeAll.value.data![index].image!}",
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(0.5),
+                                    ],
+                                  ),
+                                ),
+                                child: Center( // Wrap with Center widget
+                                  child: Padding( // Add padding to prevent text from touching edges
+                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                    child: Text(
+                                      ChallengeController.getChallengeAll.value.data![index].name!,
+                                      maxLines: 1,
+                                      textAlign: TextAlign.center, // Add text alignment
+                                      style: AppTextStyle.normalBold12.copyWith(
+                                        color: AppColors.white,
+                                        shadows: [
+                                          Shadow(
+                                            offset: const Offset(1.0, 1.0),
+                                            blurRadius: 3.0,
+                                            color: Colors.black.withOpacity(0.5),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ),
-                              );
-                            },
+                              ),
+                            ),
                           ),
+                        );
+                      },
+                    ),
+                  ),
+                  
+                  // Games Section
+                  2.ph,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Voice Bridge Games'.tr,
+                        style: AppTextStyle.normalBold16.copyWith(color: coral500),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const GamesScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'View All'.tr,
+                          style: AppTextStyle.normalBold12.copyWith(color: indigo500),
                         ),
+                      ),
+                    ],
+                  ),
+                  1.ph,
+                  SizedBox(
+                    height: screenSize.height / 8,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 2, // Two games available
+                      itemBuilder: (context, index) {
+                        final games = [
+                          {
+                            'title': 'VoiceBridge Classic',
+                            'icon': Icons.mic,
+                            'color': indigo500,
+                          },
+                          {
+                            'title': 'VoiceBridge Polished',
+                            'icon': Icons.graphic_eq,
+                            'color': coral500,
+                          },
+                        ];
+                        final game = games[index];
+                        
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const GamesScreen(),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 15),
+                            child: Container(
+                              width: screenSize.width / 2.2,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: AppColors.white,
+                                border: Border.all(color: indigo50, width: 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (game['color'] as Color).withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: (game['color'] as Color).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      game['icon'] as IconData,
+                                      color: game['color'] as Color,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                    child: Text(
+                                      game['title'] as String,
+                                      maxLines: 2,
+                                      textAlign: TextAlign.center,
+                                      style: AppTextStyle.normalBold12.copyWith(
+                                        color: headingColour,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  
                   2.ph,
                   GestureDetector(
                     onTap: () {
@@ -341,8 +631,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: Container(
                       width: double.infinity,
-                      height: 100,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      height: 110,
+                      // padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.only(left: 20, right: 20, top: 10, ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         gradient: const LinearGradient(
@@ -354,18 +645,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           begin: Alignment.bottomLeft,
                           end: Alignment.topRight,
                         ),
+                        color: Colors.red,
                       ),
                       child: Stack(
                         children: [
                           Positioned(
-                            right: 0,
-                            bottom: 0,
+                            right: -40,
+                            top: 0,
                             child: Opacity(
-                              opacity: .4,
+                              opacity: .2,
                               child: Image.asset(
                                 'images/bgviewprofile.png',
-                                width: 70, // Adjust the width as needed
-                                height: 70, // Adjust the height as needed
+                                width: 180, // Adjust the width as needed
+                                height: 180, // Adjust the height as needed
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -374,31 +666,34 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
+                              1.ph,
                               Text(
                                 "To Do List".tr,
-                                style: AppTextStyle.normalBold20
-                                    .copyWith(color: Colors.white),
+                                style: AppTextStyle.normalBold18
+                                    .copyWith(color: Colors.white, fontWeight: FontWeight.w800),
                               ),
                               1.ph,
                               Row(
                                 children: [
                                   Image.asset(
                                     'icons/todo.png',
-                                    height: 40,
-                                    width: 40,
+                                    height: 30,
+                                    width: 30,
                                   ),
+                                  1.pw,
                                   Flexible(
                                     child: Text(
                                       "Complete tasks & win exclusive badges and premium subscriptions."
                                           .tr,
-                                      style: AppTextStyle.normalBold12.copyWith(
-                                        fontWeight: FontWeight.normal,
+                                      style: AppTextStyle.normalBold14.copyWith(
+                                        fontWeight: FontWeight.w500,
                                         color: Colors.white,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
+                              1.ph
                             ],
                           ),
                         ],
@@ -444,7 +739,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .then(
                                 (value) {
                                   HomeController.backToHomeChapter(true);
-                                  nextPage(ReadStoriesPage(
+                                  nextPage(ReadStoriesScreen(
                                     // chapter: ReadController.chapter[index]['chapter'],
                                     chapterId: HomeController
                                             .getLastReadChapterModel
@@ -581,13 +876,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       style:
                           AppTextStyle.normalBold16.copyWith(color: coral500),
                     ),
-                  if ((ChatController
-                              .getAllCharactersModel.value.data?.length ??
-                          0) >
-                      0)
+                  if ((ChatController.getAllCharactersModel.value.data?.length ?? 0) > 0)
                     1.ph,
-                  if ((ChatController
-                              .getAllCharactersModel.value.data?.length ??
+                  if ((ChatController.getAllCharactersModel.value.data?.length ??
                           0) >
                       0)
                     SizedBox(
@@ -607,22 +898,25 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.only(right: 30),
                             child: GestureDetector(
                               onTap: () {
-                                HomeController.backToHomeFromCharactersDetails(
-                                    true);
-                                ChatController
-                                    .backToCharactersForCharactersDetails(
-                                        false);
-                                nextPage(
-                                  CharactersDetailsPage(
-                                    characterId: ChatController
-                                            .getAllCharactersModel
-                                            .value
-                                            .data?[index]
-                                            .id
-                                            .toString() ??
-                                        '',
-                                  ),
-                                );
+                                bool isUnlocked = ChatController.getAllCharactersModel.value.data?[index].isCharacterUnlocked ?? false;
+                                
+                                if (isUnlocked) {
+                                  // If character is unlocked, go to messaging page
+                                  nextPage(MessagingPage(
+                                    name: ChatController.getAllCharactersModel.value.data?[index].name.toString() ?? '',
+                                    image: ChatController.getAllCharactersModel.value.data?[index].characterImage.toString() ?? '',
+                                    characterId: ChatController.getAllCharactersModel.value.data?[index].id.toString() ?? '',
+                                  ));
+                                } else {
+                                  // If character is locked, go to character details page
+                                  HomeController.backToHomeFromCharactersDetails(true);
+                                  ChatController.backToCharactersForCharactersDetails(false);
+                                  nextPage(
+                                    CharactersDetailsPage(
+                                      characterId: ChatController.getAllCharactersModel.value.data?[index].id.toString() ?? '',
+                                    ),
+                                  );
+                                }
                               },
                               child: Column(
                                 children: [
@@ -661,10 +955,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             fit: BoxFit.cover,
                                           ),
                                         ),
-                                        SvgPicture.asset('icons/lock.svg'),
+                                        // SvgPicture.asset('icons/lock.svg')
+                                        getLockImage(index),
+
                                       ],
                                     ),
                                   ),
+                                  
                                   Text(
                                     ((ChatController.getAllCharactersModel.value
                                                         .data?[index].name
@@ -696,4 +993,16 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
   }
+
+  getLockImage(int index) {
+    Widget lockImage = !(ChatController
+        .getAllCharactersModel
+        .value
+        .data?[index]
+        .isCharacterUnlocked ?? false) ?
+    SvgPicture.asset('icons/lock.svg') : Container();
+    return lockImage;
+  }
+
+
 }

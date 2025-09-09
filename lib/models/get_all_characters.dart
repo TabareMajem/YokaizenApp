@@ -48,6 +48,7 @@ class Datum {
   String? characterImage;
   DateTime? createdAt;
   DateTime? updatedAt;
+  bool? isCharacterUnlocked;
 
   Datum({
     this.id,
@@ -58,6 +59,7 @@ class Datum {
     this.characterImage,
     this.createdAt,
     this.updatedAt,
+    this.isCharacterUnlocked
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -73,6 +75,9 @@ class Datum {
         updatedAt: json["updated_at"] == null
             ? null
             : DateTime.parse(json["updated_at"]),
+        isCharacterUnlocked: json["isCharacterUnlocked"] == null
+            ? false
+            : json["isCharacterUnlocked"]
       );
 
   Map<String, dynamic> toJson() => {
@@ -84,5 +89,6 @@ class Datum {
         "character_image": characterImage,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
+        "isCharacterUnlocked" : isCharacterUnlocked,
       };
 }

@@ -1,0 +1,246 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:typed_data';
+import '../models/admin_state.dart';
+import '../models/visual_asset.dart';
+import '../services/storage_service.dart';
+
+class VisualAssetManager extends StatefulWidget {
+  final AssetType assetType;
+  final String? currentAssetId;
+  final Function(VisualAsset) onSelectAsset;
+  final String title;
+
+  const VisualAssetManager({
+    Key? key,
+    required this.assetType,
+    this.currentAssetId,
+    required this.onSelectAsset,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  _VisualAssetManagerState createState() => _VisualAssetManagerState();
+}
+
+class _VisualAssetManagerState extends State<VisualAssetManager> {
+  bool _isLoading = true;
+  bool _isUploading = false;
+  String _searchQuery = '';
+  List<VisualAsset> _assets = [];
+  List<VisualAsset> _filteredAssets = [];
+  String? _errorMessage;
+  final StorageService _storageService = StorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAssets();
+  }
+
+  Future<void> _loadAssets() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Load assets based on type
+      final assets = await _storageService.getVisualAssets(widget.assetType);
+      
+      setState(() {
+        _assets = assets;
+        _applyFilters();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load assets: $e';
+      });
+    }
+  }
+
+  void _applyFilters() {
+    if (_searchQuery.isEmpty) {
+      _filteredAssets = List.from(_assets);
+    } else {
+      _filteredAssets = _assets.where((asset) {
+        return asset.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+               asset.tags.any((tag) => tag.toLowerCase().contains(_searchQuery.toLowerCase()));
+      }).toList();
+    }
+  }
+
+  Future<void> _uploadNewAsset() async {
+    // Show upload options dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Upload New ${_getAssetTypeName()}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Select a ${_getAssetTypeName().toLowerCase()} file to upload:'),
+            const SizedBox(height: 8),
+            Text(
+              'Supported formats: ${_getSupportedFormats()}',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Max file size: 5MB',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _pickAndUploadFile();
+            },
+            child: const Text('Select File'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickAndUploadFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: _getAllowedExtensions(),
+      );
+
+      if (result != null && result.files.single.bytes != null) {
+        setState(() {
+          _isUploading = true;
+        });
+
+        // Show file name dialog
+        final fileName = await _showFileNameDialog(result.files.single.name);
+        
+        if (fileName != null) {
+          // Show tags dialog
+          final tags = await _showTagsDialog();
+          
+          if (tags != null) {
+            // Upload the file
+            final asset = await _storageService.uploadVisualAsset(
+              widget.assetType,
+              fileName,
+              result.files.single.bytes!,
+              tags,
+            );
+            
+            setState(() {
+              _assets.add(asset);
+              _applyFilters();
+              _isUploading = false;
+            });
+            
+            // Show success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${_getAssetTypeName()} uploaded successfully')),
+            );
+          } else {
+            setState(() {
+              _isUploading = false;
+            });
+          }
+        } else {
+          setState(() {
+            _isUploading = false;
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isUploading = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error uploading file: $e')),
+      );
+    }
+  }
+
+  Future<String?> _showFileNameDialog(String originalName) async {
+    final controller = TextEditingController(text: originalName);
+    
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Asset Name'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter a name for this asset:'),
+            const SizedBox(height: 8),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Asset Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<List<String>?> _showTagsDialog() async {
+    final List<String> tags = [];
+    final controller = TextEditingController();
+    
+    return showDialog<List<String>>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Asset Tags'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Add tags to help find this asset later:'),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          labelText: 'Tag',
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter a tag and press Add',
+                        ),
+                        onSubmitted: (value) {
+                          if (value.isNotEmpty) {
+                            setState(() {
+                              tags.add(value.toLowerCase());
+                              controller.clear();
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                

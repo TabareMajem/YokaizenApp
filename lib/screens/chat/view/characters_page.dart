@@ -26,21 +26,20 @@ class CharactersPage extends StatefulWidget {
 class _CharactersPageState extends State<CharactersPage> {
   @override
   void initState() {
-    print("mohd saad bhati");
     isLoading(true);
     fetchCharactersData();
     super.initState();
   }
 
   fetchCharactersData() async {
-    print("mohd");
     await ChatController.getAllCharacters('').then(
       (value) async {
-        await ChatController.getUnlockCharacters('').then(
-          (value) {
-            isLoading(false);
-          },
-        );
+        isLoading(false);
+        // await ChatController.getUnlockCharacters('').then(
+        //   (value) {
+        //     isLoading(false);
+        //   },
+        // );
       },
     );
   }
@@ -157,20 +156,23 @@ class _CharactersPageState extends State<CharactersPage> {
                     ),
                   ],
                 ),
+                SizedBox(height: 25,),
+                Container(
+                  child: CustomSearchBar(
+                      controller: ChatController.charactersSearch,
+                      onTextChanged: (p0) async {
+                        if (ChatController.isBrowseOrChats.isTrue) {
+                          await ChatController.getAllCharacters(p0).then(
+                            (value) {},
+                          );
+                        } else {
+                          await ChatController.getUnlockCharacters(p0).then(
+                            (value) {},
+                          );
+                        }
+                      }),
+                ),
                 3.ph,
-                CustomSearchBar(
-                    controller: ChatController.charactersSearch,
-                    onTextChanged: (p0) async {
-                      if (ChatController.isBrowseOrChats.isTrue) {
-                        await ChatController.getAllCharacters(p0).then(
-                          (value) {},
-                        );
-                      } else {
-                        await ChatController.getUnlockCharacters(p0).then(
-                          (value) {},
-                        );
-                      }
-                    }),
                 // if (ChatController.isBrowseOrChats.isTrue) 4.ph,
                 if (ChatController.isBrowseOrChats.isTrue)
                   ((ChatController.getAllCharactersModel.value.data?.length ??
@@ -190,25 +192,27 @@ class _CharactersPageState extends State<CharactersPage> {
                           itemCount: ChatController
                               .getAllCharactersModel.value.data?.length,
                           itemBuilder: (context, index) {
-                            print(
-                                "getAllCharactersModel length :: ${ChatController.getAllCharactersModel.value.data?.length}");
                             return GestureDetector(
                               onTap: () {
-                                ChatController
-                                    .backToCharactersForCharactersDetails(true);
-                                HomeController.backToHomeFromCharactersDetails(
-                                    false);
-                                nextPage(
-                                  CharactersDetailsPage(
-                                    characterId: ChatController
-                                            .getAllCharactersModel
-                                            .value
-                                            .data?[index]
-                                            .id
-                                            .toString() ??
-                                        '',
-                                  ),
-                                );
+                                bool isUnlocked = ChatController.getAllCharactersModel.value.data?[index].isCharacterUnlocked ?? false;
+                                
+                                if (isUnlocked) {
+                                  // If character is unlocked, go to messaging page
+                                  nextPage(MessagingPage(
+                                    name: ChatController.getAllCharactersModel.value.data?[index].name.toString() ?? '',
+                                    image: ChatController.getAllCharactersModel.value.data?[index].characterImage.toString() ?? '',
+                                    characterId: ChatController.getAllCharactersModel.value.data?[index].id.toString() ?? '',
+                                  ));
+                                } else {
+                                  // If character is locked, go to character details page
+                                  ChatController.backToCharactersForCharactersDetails(true);
+                                  HomeController.backToHomeFromCharactersDetails(false);
+                                  nextPage(
+                                    CharactersDetailsPage(
+                                      characterId: ChatController.getAllCharactersModel.value.data?[index].id.toString() ?? '',
+                                    ),
+                                  );
+                                }
                               },
                               child: Column(
                                 children: [
@@ -244,13 +248,15 @@ class _CharactersPageState extends State<CharactersPage> {
                                           fit: BoxFit.cover,
                                         ),
                                       ),
-                                      SvgPicture.asset(
-                                        'icons/lock.svg',
-                                        height: 20,
-                                      ),
+                                      if (!(ChatController.getAllCharactersModel.value.data?[index].isCharacterUnlocked ?? false))
+                                        SvgPicture.asset(
+                                          'icons/lock.svg',
+                                          height: 20,
+                                        ),
                                     ],
                                   ),
                                   Text(
+                                    textAlign: TextAlign.center,
                                     ChatController.getAllCharactersModel.value
                                             .data?[index].name
                                             .toString() ??
@@ -270,7 +276,8 @@ class _CharactersPageState extends State<CharactersPage> {
                   if (ChatController
                       .getUnlockCharactersModel.value.data!.isEmpty)
                     Expanded(
-                      child: Column(
+                      child:
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           2.ph,

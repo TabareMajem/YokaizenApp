@@ -1,0 +1,781 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import '../models/quiz_module.dart';
+import '../models/admin_state.dart';
+
+class QuizCreator extends StatefulWidget {
+  const QuizCreator({Key? key}) : super(key: key);
+
+  @override
+  _QuizCreatorState createState() => _QuizCreatorState();
+}
+
+class _QuizCreatorState extends State<QuizCreator> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final Uuid _uuid = const Uuid();
+  
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+    
+    // Initialize with default quiz if needed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final adminState = Provider.of<AdminState>(context, listen: false);
+      if (adminState.quizModule == null) {
+        adminState.initializeQuizModule(QuizType.multipleChoice);
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AdminState>(
+      builder: (context, adminState, _) {
+        final quizModule = adminState.quizModule;
+        
+        if (quizModule == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with quiz type selection
+            _buildHeader(quizModule, adminState),
+            
+            const SizedBox(height: 16),
+            
+            // Tab navigation for quiz editor sections
+            TabBar(
+              controller: _tabController,
+              labelColor: Theme.of(context).primaryColor,
+              tabs: const [
+                Tab(text: 'Questions', icon: Icon(Icons.help_outline)),
+                Tab(text: 'Answers', icon: Icon(Icons.checklist)),
+                Tab(text: 'Feedback', icon: Icon(Icons.comment)),
+                Tab(text: 'Preview', icon: Icon(Icons.visibility)),
+              ],
+            ),
+            
+            // Tab content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildQuestionsTab(quizModule, adminState),
+                  _buildAnswersTab(quizModule, adminState),
+                  _buildFeedbackTab(quizModule, adminState),
+                  _buildPreviewTab(quizModule),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  Widget _buildHeader(QuizModule quiz, AdminState adminState) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Quiz Creator',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    initialValue: quiz.title,
+                    decoration: const InputDecoration(
+                      labelText: 'Quiz Title',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      adminState.updateQuizModule(
+                        quiz.copyWith(title: value),
+                      );
+                    },
+                  ),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                Expanded(
+                  child: DropdownButtonFormField<QuizType>(
+                    value: quiz.quizType,
+                    decoration: const InputDecoration(
+                      labelText: 'Quiz Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: QuizType.multipleChoice,
+                        child: Text('Multiple Choice'),
+                      ),
+                      DropdownMenuItem(
+                        value: QuizType.trueFalse,
+                        child: Text('True/False'),
+                      ),
+                      DropdownMenuItem(
+                        value: QuizType.matching,
+                        child: Text('Matching'),
+                      ),
+                      DropdownMenuItem(
+                        value: QuizType.sorting,
+                        child: Text('Sorting/Categorization'),
+                      ),
+                      DropdownMenuItem(
+                        value: QuizType.freeResponse,
+                        child: Text('Free Response'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        // Show confirmation dialog if changing quiz type on existing content
+                        if (quiz.questions.isNotEmpty) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Change Quiz Type?'),
+                              content: const Text('Changing the quiz type will reset your current questions. Continue?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    adminState.initializeQuizModule(value);
+                                  },
+                                  child: const Text('Continue'),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          adminState.initializeQuizModule(value);
+                        }
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
+            
+            TextFormField(
+              initialValue: quiz.description,
+              maxLines: 2,
+              decoration: const InputDecoration(
+                labelText: 'Quiz Description',
+                border: OutlineInputBorder(),
+                hintText: 'Explain what this quiz is about and what it measures',
+              ),
+              onChanged: (value) {
+                adminState.updateQuizModule(
+                  quiz.copyWith(description: value),
+                );
+              },
+            ),
+            
+            const SizedBox(height: 16),
+            
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    initialValue: quiz.passingScore.toString(),
+                    decoration: const InputDecoration(
+                      labelText: 'Passing Score (%)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      final score = int.tryParse(value) ?? 70;
+                      adminState.updateQuizModule(
+                        quiz.copyWith(passingScore: score.clamp(0, 100)),
+                      );
+                    },
+                  ),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                Expanded(
+                  child: TextFormField(
+                    initialValue: quiz.timeLimit.toString(),
+                    decoration: const InputDecoration(
+                      labelText: 'Time Limit (minutes, 0 for none)',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      final limit = int.tryParse(value) ?? 0;
+                      adminState.updateQuizModule(
+                        quiz.copyWith(timeLimit: limit),
+                      );
+                    },
+                  ),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: quiz.difficulty,
+                    decoration: const InputDecoration(
+                      labelText: 'Difficulty Level',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'easy', child: Text('Easy')),
+                      DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                      DropdownMenuItem(value: 'hard', child: Text('Hard')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        adminState.updateQuizModule(
+                          quiz.copyWith(difficulty: value),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildQuestionsTab(QuizModule quiz, AdminState adminState) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Quiz Questions',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add),
+                label: const Text('Add Question'),
+                onPressed: () => _addNewQuestion(quiz, adminState),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Empty state
+          if (quiz.questions.isEmpty)
+            const Expanded(
+              child: Center(
+                child: Text(
+                  'No questions yet. Add your first question to get started!',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            ),
+          
+          // Questions list
+          if (quiz.questions.isNotEmpty)
+            Expanded(
+              child: ReorderableListView.builder(
+                itemCount: quiz.questions.length,
+                onReorder: (oldIndex, newIndex) {
+                  if (oldIndex < newIndex) {
+                    newIndex -= 1;
+                  }
+                  
+                  final updatedQuestions = List<Question>.from(quiz.questions);
+                  final item = updatedQuestions.removeAt(oldIndex);
+                  updatedQuestions.insert(newIndex, item);
+                  
+                  adminState.updateQuizModule(
+                    quiz.copyWith(questions: updatedQuestions),
+                  );
+                },
+                itemBuilder: (context, index) {
+                  final question = quiz.questions[index];
+                  return Card(
+                    key: Key(question.id),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                child: Text(
+                                  '${index + 1}',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              
+                              const SizedBox(width: 16),
+                              
+                              Expanded(
+                                child: DropdownButtonFormField<QuestionType>(
+                                  value: question.questionType,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Question Type',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  items: _getQuestionTypeOptions(quiz.quizType),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      final updatedQuestion = question.copyWith(
+                                        questionType: value,
+                                        // Reset options for new question type
+                                        options: [],
+                                      );
+                                      
+                                      final updatedQuestions = List<Question>.from(quiz.questions);
+                                      updatedQuestions[index] = updatedQuestion;
+                                      
+                                      adminState.updateQuizModule(
+                                        quiz.copyWith(questions: updatedQuestions),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () => _editQuestion(quiz, adminState, index),
+                                tooltip: 'Edit Question',
+                              ),
+                              
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => _deleteQuestion(quiz, adminState, index),
+                                tooltip: 'Delete Question',
+                              ),
+                            ],
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
+                          TextFormField(
+                            initialValue: question.text,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              labelText: 'Question Text',
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter your question here',
+                            ),
+                            onChanged: (value) {
+                              final updatedQuestion = question.copyWith(text: value);
+                              final updatedQuestions = List<Question>.from(quiz.questions);
+                              updatedQuestions[index] = updatedQuestion;
+                              
+                              adminState.updateQuizModule(
+                                quiz.copyWith(questions: updatedQuestions),
+                              );
+                            },
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  initialValue: question.points.toString(),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Points',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    final points = int.tryParse(value) ?? 1;
+                                    final updatedQuestion = question.copyWith(points: points.clamp(1, 100));
+                                    final updatedQuestions = List<Question>.from(quiz.questions);
+                                    updatedQuestions[index] = updatedQuestion;
+                                    
+                                    adminState.updateQuizModule(
+                                      quiz.copyWith(questions: updatedQuestions),
+                                    );
+                                  },
+                                ),
+                              ),
+                              
+                              const SizedBox(width: 16),
+                              
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: question.difficulty,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Difficulty',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  items: const [
+                                    DropdownMenuItem(value: 'easy', child: Text('Easy')),
+                                    DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                                    DropdownMenuItem(value: 'hard', child: Text('Hard')),
+                                  ],
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      final updatedQuestion = question.copyWith(difficulty: value);
+                                      final updatedQuestions = List<Question>.from(quiz.questions);
+                                      updatedQuestions[index] = updatedQuestion;
+                                      
+                                      adminState.updateQuizModule(
+                                        quiz.copyWith(questions: updatedQuestions),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              
+                              const SizedBox(width: 16),
+                              
+                              Expanded(
+                                child: TextFormField(
+                                  initialValue: question.explanation,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Explanation (Optional)',
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Explain the correct answer',
+                                  ),
+                                  onChanged: (value) {
+                                    final updatedQuestion = question.copyWith(explanation: value);
+                                    final updatedQuestions = List<Question>.from(quiz.questions);
+                                    updatedQuestions[index] = updatedQuestion;
+                                    
+                                    adminState.updateQuizModule(
+                                      quiz.copyWith(questions: updatedQuestions),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          
+                          // Preview of answers/options
+                          if (question.options.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Answer Options:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: question.options.map((option) {
+                                return Chip(
+                                  backgroundColor: option.isCorrect
+                                      ? Colors.green.shade100
+                                      : Colors.grey.shade100,
+                                  label: Text(
+                                    option.text.length > 30
+                                        ? '${option.text.substring(0, 30)}...'
+                                        : option.text,
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildAnswersTab(QuizModule quiz, AdminState adminState) {
+    // If no questions, show a message
+    if (quiz.questions.isEmpty) {
+      return const Center(
+        child: Text('Please add questions before configuring answers.'),
+      );
+    }
+    
+    // Show editor for the first question that needs answers
+    int selectedQuestionIndex = 0;
+    for (int i = 0; i < quiz.questions.length; i++) {
+      if (quiz.questions[i].options.isEmpty) {
+        selectedQuestionIndex = i;
+        break;
+      }
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Question selector
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              const Text(
+                'Configure Answers for Question:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              
+              const SizedBox(width: 16),
+              
+              Expanded(
+                child: DropdownButtonFormField<int>(
+                  value: selectedQuestionIndex,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
+                  items: List.generate(quiz.questions.length, (index) {
+                    return DropdownMenuItem<int>(
+                      value: index,
+                      child: Text('Question ${index + 1}: ${_truncateText(quiz.questions[index].text, 50)}'),
+                    );
+                  }),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedQuestionIndex = value;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Divider
+        const Divider(),
+        
+        // Answer editor based on question type
+        Expanded(
+          child: _buildAnswerEditorForQuestion(
+            quiz,
+            adminState,
+            quiz.questions[selectedQuestionIndex],
+            selectedQuestionIndex,
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildAnswerEditorForQuestion(
+    QuizModule quiz,
+    AdminState adminState,
+    Question question,
+    int questionIndex,
+  ) {
+    // Different editor based on question type
+    switch (question.questionType) {
+      case QuestionType.multipleChoice:
+        return _buildMultipleChoiceEditor(quiz, adminState, question, questionIndex);
+      case QuestionType.trueFalse:
+        return _buildTrueFalseEditor(quiz, adminState, question, questionIndex);
+      case QuestionType.matching:
+        return _buildMatchingEditor(quiz, adminState, question, questionIndex);
+      case QuestionType.sorting:
+        return _buildSortingEditor(quiz, adminState, question, questionIndex);
+      case QuestionType.freeResponse:
+        return _buildFreeResponseEditor(quiz, adminState, question, questionIndex);
+      default:
+        return const Center(child: Text('Unsupported question type'));
+    }
+  }
+  
+  // This is a simplified implementation of just one answer editor type
+  // In a real implementation, you'd create all the different types
+  Widget _buildMultipleChoiceEditor(
+    QuizModule quiz,
+    AdminState adminState,
+    Question question,
+    int questionIndex,
+  ) {
+    // Initialize options if empty
+    final options = question.options.isEmpty
+        ? [
+            Option(id: _uuid.v4(), text: '', isCorrect: true),
+            Option(id: _uuid.v4(), text: '', isCorrect: false),
+            Option(id: _uuid.v4(), text: '', isCorrect: false),
+            Option(id: _uuid.v4(), text: '', isCorrect: false),
+          ]
+        : question.options;
+    
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Question: ${question.text}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          const Text(
+            'Configure multiple choice options. Mark the correct answer(s).',
+            style: TextStyle(color: Colors.grey),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Expanded(
+            child: ListView.builder(
+              itemCount: options.length + 1, // +1 for add button
+              itemBuilder: (context, index) {
+                if (index == options.length) {
+                  // Add option button
+                  return ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Another Option'),
+                    onPressed: () {
+                      final updatedOptions = List<Option>.from(options);
+                      updatedOptions.add(
+                        Option(id: _uuid.v4(), text: '', isCorrect: false),
+                      );
+                      
+                      final updatedQuestion = question.copyWith(options: updatedOptions);
+                      final updatedQuestions = List<Question>.from(quiz.questions);
+                      updatedQuestions[questionIndex] = updatedQuestion;
+                      
+                      adminState.updateQuizModule(
+                        quiz.copyWith(questions: updatedQuestions),
+                      );
+                    },
+                  );
+                }
+                
+                // Option editor
+                final option = options[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Option letter
+                        CircleAvatar(
+                          backgroundColor: Colors.grey.shade200,
+                          child: Text(
+                            String.fromCharCode(65 + index), // A, B, C, ...
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(width: 16),
+                        
+                        // Option text
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: option.text,
+                            decoration: const InputDecoration(
+                              labelText: 'Option Text',
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter answer option',
+                            ),
+                            onChanged: (value) {
+                              final updatedOption = option.copyWith(text: value);
+                              final updatedOptions = List<Option>.from(options);
+                              updatedOptions[index] = updatedOption;
+                              
+                              final updatedQuestion = question.copyWith(options: updatedOptions);
+                              final updatedQuestions = List<Question>.from(quiz.questions);
+                              updatedQuestions[questionIndex] = updatedQuestion;
+                              
+                              adminState.updateQuizModule(
+                                quiz.copyWith(questions: updatedQuestions),
+                              );
+                            },
+                          ),
+                        ),
+                        
+                        const SizedBox(width: 16),
+                        
+                        // Correct answer checkbox
+                        Column(
+                          children: [
+                            Checkbox(
+                              value: option.isCorrect,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  final updatedOption = option.copyWith(isCorrect: value);
+                                  final updatedOptions = List<Option>.from(options);
+                                  updatedOptions[index] = updatedOption;
+                                  
+                                  final updatedQuestion = question.copyWith(options: updatedOptions);
+                                  final updatedQuestions = List<Question>.from(quiz.questions);
+                                  updatedQuestions[questionIndex] = updatedQuestion;
+                                  
+                                  adminState.updateQuizModule(
+                                    quiz.copyWith(questions: updatedQuestions),
+                                  );
+                                }
+                              },
+                            ),
+                            const Text('Correct', style: TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                        
+                        // Delete button
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: options.length <= 2
+                              ? null // Disable if only 2 options left
+                              : () {
+                                  final updatedOptions = List<Option>.from(options);
+                                  updatedOptions.removeAt(index);
+                                  
+                                  // Ensure at least one correct answer
+                                  bool hasCorrect = updatedOptions.any((opt) => opt.isCorrect);
+                                  if (!hasCorrect && updatedOptions.isNotEmpty) {
+                                    updatedOptions[0] = updatedOptions[0].copyWith(isCorrect: true);
+                                  }
+                                  
+                                  final updatedQuestion = question.copyWith(options: updatedOptions);
+                                  final updatedQuestions = List<Question>.from(quiz.questions);
+                                  updatedQuestions[questionIndex] = updatedQuestion;
+                                  
+                                  adminState.updateQuizModule(
+                                    quiz.copyWith(questions: updatedQuestions),
+                                  );
+                                },
+                        ),
+                      ],
+                    ),
+                  ),
+                

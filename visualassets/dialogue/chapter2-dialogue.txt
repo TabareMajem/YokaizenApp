@@ -1,0 +1,19 @@
+title: Chapter2_Start
+---
+<<change_background classroom_morning>>
+
+A week has passed since the strange discovery... #narration
+
+<<show_character hana neutral center>>
+Hana: The symbols in my AR display... they're getting clearer. #emotion: thoughtful
+
+<<show_character mei worried left>>
+Mei: The colors around you have changed too. They're... brighter somehow. #emotion: concerned
+
+<<change_background storage_room>>
+<<play_sound time_shard_activate>>
+<<show_effect time_shard_glow>>
+<<set $time_shard_activated = true>>
+
+The Time Shard resonates with Hana's AR glasses... #narration
+===

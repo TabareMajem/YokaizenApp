@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/qc_dp_6">
+
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:id="@+id/csl_top"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        android:layout_marginLeft="@dimen/qc_dp_26"-->
+<!--        android:layout_marginRight="@dimen/qc_dp_26"-->
+<!--        android:background="@drawable/bg_rect_ffffff_corner_12"-->
+<!--        app:layout_constraintLeft_toRightOf="@+id/image_sleep">-->
+
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:id="@+id/csl_heart"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginLeft="@dimen/qc_dp_30"-->
+<!--            app:layout_constraintRight_toRightOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/home_sleep_title"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginLeft="@dimen/qc_dp_8"-->
+<!--                android:layout_marginTop="@dimen/qc_dp_10"-->
+<!--                android:maxWidth="@dimen/qc_dp_200"-->
+<!--                android:maxLines="2"-->
+<!--                android:textStyle="bold"-->
+<!--                android:text="@string/qc_text_84"-->
+<!--                android:textColor="@color/rcv_item_heat_title"-->
+<!--                android:textSize="@dimen/qc_sp_20"-->
+<!--                app:layout_constraintLeft_toLeftOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/home_sleep_date"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginLeft="@dimen/qc_dp_8"-->
+<!--                android:layout_marginTop="@dimen/qc_dp_6"-->
+<!--                android:text=""-->
+<!--                android:textColor="@color/rcv_item_heat_date"-->
+<!--                android:textSize="@dimen/qc_sp_10"-->
+<!--                app:layout_constraintLeft_toLeftOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/home_sleep_title" />-->
+
+
+<!--            <TextView-->
+<!--                android:id="@+id/home_sleep_value"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                app:layout_constraintRight_toLeftOf="@+id/home_sleep_h"-->
+<!--                android:textColor="@color/pg_home_heart_11"-->
+<!--                android:textSize="@dimen/qc_sp_30"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                android:layout_marginTop="@dimen/qc_dp_6"-->
+<!--                android:layout_marginLeft="@dimen/qc_dp_8"-->
+<!--                android:textStyle="bold"-->
+<!--                android:text="&#45;&#45;"-->
+<!--                />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/home_sleep_h"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@color/rcv_item_sleep_unit"-->
+<!--                android:textSize="@dimen/qc_sp_12"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/home_sleep_value"-->
+<!--                android:layout_marginTop="@dimen/qc_dp_6"-->
+<!--                android:layout_marginLeft="@dimen/qc_dp_8"-->
+<!--                app:layout_constraintRight_toLeftOf="@+id/home_sleep_value_min"-->
+<!--                android:textStyle="bold"-->
+<!--                android:paddingBottom="@dimen/qc_dp_4"-->
+<!--                android:text="@string/qc_text_90"-->
+<!--                />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/home_sleep_value_min"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@color/pg_home_heart_11"-->
+<!--                android:textSize="@dimen/qc_sp_30"-->
+<!--                app:layout_constraintRight_toLeftOf="@+id/home_sleep_min"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                android:layout_marginTop="@dimen/qc_dp_6"-->
+<!--                android:textStyle="bold"-->
+<!--                android:text="&#45;&#45;"-->
+<!--                />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/home_sleep_min"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/home_sleep_value_min"-->
+<!--                android:textStyle="bold"-->
+<!--                android:paddingBottom="@dimen/qc_dp_4"-->
+<!--                android:text="@string/qc_text_91"-->
+<!--                android:layout_marginLeft="@dimen/qc_dp_8"-->
+<!--                android:layout_marginTop="@dimen/qc_dp_6"-->
+<!--                android:layout_marginRight="@dimen/qc_dp_10"-->
+<!--                android:textColor="@color/heart_value_unit"-->
+<!--                android:textSize="@dimen/qc_sp_12"-->
+<!--                app:layout_constraintRight_toRightOf="parent"-->
+<!--                />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/home_sleep_target"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@color/rcv_item_sleep_unit"-->
+<!--                android:textSize="@dimen/qc_sp_10"-->
+<!--                android:layout_marginLeft="@dimen/qc_dp_8"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/home_sleep_date"-->
+<!--                app:layout_constraintRight_toRightOf="@+id/home_sleep_min"-->
+<!--                android:paddingBottom="@dimen/qc_dp_4"-->
+<!--                />-->
+
+<!--            <View-->
+<!--                android:id="@+id/line_2"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height=".5dp"-->
+<!--                android:layout_marginTop="@dimen/qc_dp_10"-->
+<!--                android:layout_marginLeft="@dimen/qc_dp_8"-->
+<!--                android:layout_marginRight="@dimen/qc_dp_10"-->
+<!--                android:background="@color/pg_home_line_2"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/home_sleep_date"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                />-->
+
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+
+<!--        <com.qcwireless.qcwatch.ui.base.view.QSleepHomeBarChart-->
+<!--            android:id="@+id/home_sleep_view"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="80dp"-->
+<!--            android:layout_marginLeft="@dimen/qc_dp_30"-->
+<!--            android:layout_marginTop="@dimen/qc_dp_10"-->
+<!--            android:layout_marginRight="@dimen/qc_dp_10"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/csl_heart" />-->
+
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+
+<!--    <ImageView-->
+<!--        android:id="@+id/image_sleep"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="@dimen/qc_dp_10"-->
+<!--        android:src="@mipmap/home_sleep_icon"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+</androidx.constraintlayout.widget.ConstraintLayout>

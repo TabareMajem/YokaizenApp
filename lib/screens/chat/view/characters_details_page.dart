@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:yokai_quiz_app/Widgets/progressHud.dart';
 import 'package:yokai_quiz_app/models/get_all_stories.dart';
-import 'package:yokai_quiz_app/screens/read/view/story_open_story_page.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
 
@@ -16,6 +15,8 @@ import '../../../util/text_styles.dart';
 import '../../home/controller/home_controller.dart';
 import '../../navigation/view/navigation.dart';
 import '../../read/controller/read_controller.dart';
+import '../../read/view/open_story_screen.dart';
+import '../../read/view/story_details_screen.dart';
 import '../controller/chat_controller.dart';
 
 class CharactersDetailsPage extends StatefulWidget {
@@ -47,15 +48,16 @@ class _CharactersDetailsPageState extends State<CharactersDetailsPage> {
   fetchCharactersNyIdData() async {
     await ChatController.getCharactersById(widget.characterId).then(
       (value) {
-  
-        ChatController.chDetails.addAll((fixEncoding(ChatController
-                    .getCharactersByIdModel.value.data?.tags
-                    .toString() ??
-                ''))
-            .replaceAll("[", '')
-            .replaceAll(']', '')
-            .split(',')
-            .map((e) => e.trim()));
+        if (ChatController.getCharactersByIdModel.value.data?.tags != null) {
+          ChatController.chDetails.addAll((fixEncoding(ChatController
+                      .getCharactersByIdModel.value.data?.tags
+                      .toString() ??
+                  ''))
+              .replaceAll("[", '')
+              .replaceAll(']', '')
+              .split(',')
+              .map((e) => e.trim()));
+        }
         isLoading(false);
       },
     );
@@ -308,7 +310,7 @@ class _CharactersDetailsPageState extends State<CharactersDetailsPage> {
                         HomeController.backToHome(false);
                         ReadController.backToStories(false);
                         ReadController.storyId('');
-                        Get.to(OpenStoryPage(
+                        Get.to(StoryDetailsScreen(
                           storyId: ChatController
                                   .getCharactersByIdModel.value.data?.storiesId
                                   .toString() ??

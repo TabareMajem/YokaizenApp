@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,7 +8,8 @@ import 'package:yokai_quiz_app/Widgets/new_button.dart';
 import 'package:yokai_quiz_app/Widgets/progressBar.dart';
 import 'package:yokai_quiz_app/Widgets/progressHud.dart';
 import 'package:yokai_quiz_app/global.dart';
-import 'package:yokai_quiz_app/screens/Refer%20and%20Earn/controller/refer_and_earn.dart';
+import 'package:yokai_quiz_app/screens/refer_and_earn/controller/refer_and_earn.dart';
+import 'package:yokai_quiz_app/screens/challenge/view/challenge_screen.dart';
 import 'package:yokai_quiz_app/screens/todo/controller/todo_controller.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
@@ -37,48 +40,63 @@ class _TodoScreenState extends State<TodoScreen> {
     return Obx(() {
       return ProgressHUD(
         isLoading: isLoading.value,
-        child: Scaffold(
-          body: SingleChildScrollView(
-            // Wrap everything in SingleChildScrollView
-            child: Container(
-              padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Row(
-                      children: [
-                        SvgPicture.asset('icons/arrowLeft.svg'),
-                        Text(
-                          "To Do List".tr,
-                          style: AppTextStyle.normalBold20
-                              .copyWith(color: coral500),
+        child:
+        // Stack(
+        //   children: [
+            Scaffold(
+              body: SingleChildScrollView(
+                // Wrap everything in SingleChildScrollView
+                child: Container(
+                  padding: const EdgeInsets.only(top: 65, left: 20, right: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset('icons/arrowLeft.svg'),
+                            Text(
+                              "To Do List".tr,
+                              style: AppTextStyle.normalBold20
+                                  .copyWith(color: coral500),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      5.ph, // Add spacing
+                      _buildCategorySection(
+                        "Share & Earn".tr,
+                        TodoController.todoList
+                            .where((task) => task['type'] == 'share')
+                            .toList(),
+                      ),
+                      3.ph,
+                      // _buildCategorySection(
+                      //   "Invite to a Challenge".tr,
+                      //   TodoController.todoList
+                      //       .where((task) => task['type'] == 'invite')
+                      //       .toList(),
+                      // ),
+                    ],
                   ),
-                  5.ph, // Add spacing
-                  _buildCategorySection(
-                    "Share & Earn".tr,
-                    TodoController.todoList
-                        .where((task) => task['type'] == 'share')
-                        .toList(),
-                  ),
-                  3.ph,
-                  _buildCategorySection(
-                    "Invite to a Challenge".tr,
-                    TodoController.todoList
-                        .where((task) => task['type'] == 'invite')
-                        .toList(),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+
+            // Positioned.fill(
+            //   child: BackdropFilter(
+            //     filter:  ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            //     child: Container(
+            //       color: Colors.black.withOpacity(0.2),
+            //     ),
+            //   ),
+            // ),
+
+        //   ],
+        // ),
       );
     });
   }
@@ -148,13 +166,14 @@ class _TodoScreenState extends State<TodoScreen> {
               });
         }
         if (task['type'] == "invite") {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                  child: Text("Invite to a Challenge".tr),
-                );
-              });
+          // showDialog(
+          //     context: context,
+          //     builder: (BuildContext context) {
+          //       return Dialog(
+          //         child: Text("Invite to a Challenge".tr),
+          //       );
+          //     });
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChallengeScreen(),));
         }
       },
       child: Container(

@@ -1,0 +1,201 @@
+class DialogueNode {
+  final String id;
+  final String title;
+  final String sceneId;
+  final String characterId;
+  final String expression;
+  final List<DialogueLine> lines;
+  final List<DialogueChoice> choices;
+  final List<StatChange> statChanges;
+  
+  DialogueNode({
+    required this.id,
+    required this.title,
+    required this.sceneId,
+    required this.characterId,
+    required this.expression,
+    required this.lines,
+    required this.choices,
+    required this.statChanges,
+  });
+  
+  // Copy with method for immutability
+  DialogueNode copyWith({
+    String? id,
+    String? title,
+    String? sceneId,
+    String? characterId,
+    String? expression,
+    List<DialogueLine>? lines,
+    List<DialogueChoice>? choices,
+    List<StatChange>? statChanges,
+  }) {
+    return DialogueNode(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      sceneId: sceneId ?? this.sceneId,
+      characterId: characterId ?? this.characterId,
+      expression: expression ?? this.expression,
+      lines: lines ?? this.lines,
+      choices: choices ?? this.choices,
+      statChanges: statChanges ?? this.statChanges,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'sceneId': sceneId,
+      'characterId': characterId,
+      'expression': expression,
+      'lines': lines.map((line) => line.toJson()).toList(),
+      'choices': choices.map((choice) => choice.toJson()).toList(),
+      'statChanges': statChanges.map((statChange) => statChange.toJson()).toList(),
+    };
+  }
+  
+  // Create from JSON
+  factory DialogueNode.fromJson(Map<String, dynamic> json) {
+    return DialogueNode(
+      id: json['id'],
+      title: json['title'],
+      sceneId: json['sceneId'],
+      characterId: json['characterId'],
+      expression: json['expression'],
+      lines: (json['lines'] as List).map((line) => DialogueLine.fromJson(line)).toList(),
+      choices: (json['choices'] as List).map((choice) => DialogueChoice.fromJson(choice)).toList(),
+      statChanges: (json['statChanges'] as List).map((statChange) => StatChange.fromJson(statChange)).toList(),
+    );
+  }
+}
+
+class DialogueLine {
+  final String id;
+  final String speakerId;
+  final String text;
+  
+  DialogueLine({
+    required this.id,
+    required this.speakerId,
+    required this.text,
+  });
+  
+  // Copy with method for immutability
+  DialogueLine copyWith({
+    String? id,
+    String? speakerId,
+    String? text,
+  }) {
+    return DialogueLine(
+      id: id ?? this.id,
+      speakerId: speakerId ?? this.speakerId,
+      text: text ?? this.text,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'speakerId': speakerId,
+      'text': text,
+    };
+  }
+  
+  // Create from JSON
+  factory DialogueLine.fromJson(Map<String, dynamic> json) {
+    return DialogueLine(
+      id: json['id'],
+      speakerId: json['speakerId'],
+      text: json['text'],
+    );
+  }
+}
+
+class DialogueChoice {
+  final String id;
+  final String text;
+  final String targetNodeId;
+  
+  DialogueChoice({
+    required this.id,
+    required this.text,
+    required this.targetNodeId,
+  });
+  
+  // Copy with method for immutability
+  DialogueChoice copyWith({
+    String? id,
+    String? text,
+    String? targetNodeId,
+  }) {
+    return DialogueChoice(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      targetNodeId: targetNodeId ?? this.targetNodeId,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'text': text,
+      'targetNodeId': targetNodeId,
+    };
+  }
+  
+  // Create from JSON
+  factory DialogueChoice.fromJson(Map<String, dynamic> json) {
+    return DialogueChoice(
+      id: json['id'],
+      text: json['text'],
+      targetNodeId: json['targetNodeId'],
+    );
+  }
+}
+
+class StatChange {
+  final String id;
+  final String statId;
+  final int value;
+  
+  StatChange({
+    required this.id,
+    required this.statId,
+    required this.value,
+  });
+  
+  // Copy with method for immutability
+  StatChange copyWith({
+    String? id,
+    String? statId,
+    int? value,
+  }) {
+    return StatChange(
+      id: id ?? this.id,
+      statId: statId ?? this.statId,
+      value: value ?? this.value,
+    );
+  }
+  
+  // Convert to JSON for storage and API
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'statId': statId,
+      'value': value,
+    };
+  }
+  
+  // Create from JSON
+  factory StatChange.fromJson(Map<String, dynamic> json) {
+    return StatChange(
+      id: json['id'],
+      statId: json['statId'],
+      value: json['value'],
+    );
+  }
+}

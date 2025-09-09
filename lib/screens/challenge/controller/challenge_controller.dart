@@ -16,9 +16,7 @@ class ChallengeController {
   static RxBool backToChallenge = false.obs;
   static Rx<ChallengeRes> getChallengeAll = ChallengeRes().obs;
 
-  static Future<bool> getAllChallenges(
-   
-  ) async {
+  static Future<bool> getAllChallenges() async {
     final headers = {
       "Content-Type": "application/json",
       "AdminToken": '${prefs.getString(LocalStorage.token).toString()}'
@@ -157,11 +155,11 @@ class ChallengeController {
           challenges.clear();
           for (var challenge in filteredChallenges) {
             challenges.add({
-              'image': challenge['badge_image_path'],
-              'badge': challenge['badge_name'],
-              'heading': challenge['name'],
-              'isCompleted': challenge['badge_step_count'],
-              'isActive': challenge['badge_type'] == 'login' ? loginCount : 0,
+              'image': challenge['badge_image_path'] ?? "",
+              'badge': challenge['badge_name'] ?? "",
+              'heading': challenge['name'] ?? "",
+              'isCompleted': challenge['badge_step_count'] ?? 0,
+              'isActive': challenge['badge_type'] == 'login' ? loginCount : 0 ?? 0,
             });
           }
         }

@@ -1,0 +1,19 @@
+title: Chapter3_Start
+---
+<<change_background school_entrance_afternoon>>
+
+The afternoon sun bathes the school in golden light... #narration
+
+<<show_character mei troubled center>>
+Mei: Something's changing... The colors I see, they're telling me something. #emotion: worried
+
+<<show_character hana concerned right>>
+Hana: My AR glasses are showing some kind of map... #emotion: focused
+
+<<change_background old_library>>
+<<play_sound mirror_reveal>>
+<<show_effect mirror_reveal>>
+<<set $empathy_mirror_found = true>>
+
+The Empathy Mirror reveals itself among the dusty shelves... #narration
+===

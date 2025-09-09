@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/googleg_*,@drawable/googleg_standard_color_18,
+              @raw/gtm_analytics,@raw/keep,
+              @drawable/common_*,@drawable/*_small,
+              @drawable/quantum_*,
+              @drawable/*_header,
+              @drawable/*_idle,@drawable/*_light,
+              @drawable/places_*,@drawable/maps_*,
+              @color/common_*,@color/places_*,@color/quantum_*,
+              @color/wallet_*" /> 

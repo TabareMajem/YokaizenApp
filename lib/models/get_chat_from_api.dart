@@ -65,8 +65,8 @@ class GetChatFromApiByCharacterId {
 }
 
 class Datum {
-  String? userId;
-  String? characterId;
+  int? userId;
+  int? characterId;
   String? question;
   DateTime? updatedAt;
   int? id;

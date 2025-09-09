@@ -12,6 +12,7 @@ import 'package:yokai_quiz_app/main.dart';
 import 'package:yokai_quiz_app/models/get_all_characters.dart';
 import 'package:yokai_quiz_app/models/get_characters_by_id.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
+import 'package:yokai_quiz_app/util/constants.dart';
 
 import '../../../models/get_chat_from_api.dart';
 import '../../../models/get_unlock_all_charecters.dart';
@@ -87,7 +88,8 @@ class ChatController {
   static Future<bool> getAllCharacters(String search) async {
     final headers = {
       "Content-Type": "application/json",
-      "UserToken": prefs.getString(LocalStorage.token).toString()
+      "UserToken": prefs.getString(LocalStorage.token).toString(),
+      "Accept-Language" : constants.deviceLanguage,
     };
     print("character");
     final String url = '${DatabaseApi.getAllCharacters}$search';
@@ -96,8 +98,9 @@ class ChatController {
       return await http
           .get(Uri.parse(url), headers: headers)
           .then((value) async {
-        print("getAllCharacters :: ${value.body}");
-        final jsonData = jsonDecode(value.body);
+        final result = utf8.decode(value.bodyBytes, allowMalformed: true);
+        print("getAllCharacters :: ${result}");
+        final jsonData = jsonDecode(result);
         if (jsonData["status"].toString() != "true") {
           showErrorMessage(jsonData["message"].toString(), colorError);
           return false;
@@ -105,7 +108,7 @@ class ChatController {
         print("bhati saad");
         print(value.body);
         //showSnackbar("Subscription PlanPrice Details Added Successfully", colorSuccess);
-        getAllCharactersModel(getAllCharactersFromJson(value.body));
+        getAllCharactersModel(getAllCharactersFromJson(result));
         return true;
       });
     } on Exception catch (e) {
@@ -119,7 +122,8 @@ class ChatController {
   static Future<bool> getCharactersById(String id) async {
     final headers = {
       "Content-Type": "application/json",
-      "UserToken": prefs.getString(LocalStorage.token).toString()
+      "UserToken": prefs.getString(LocalStorage.token).toString(),
+      "Accept-Language" : constants.deviceLanguage,
     };
     final String url = '${DatabaseApi.getCharactersById}$id';
     customPrint("getCharactersById url :: $url");
@@ -127,6 +131,7 @@ class ChatController {
       return await http
           .get(Uri.parse(url), headers: headers)
           .then((value) async {
+        // final result = utf8.decode(value.bodyBytes, allowMalformed: true);
         print("getCharactersById :: ${value.body}");
         final jsonData = jsonDecode(value.body);
         if (jsonData["status"].toString() != "true") {
@@ -191,19 +196,30 @@ class ChatController {
       )
           .then((value) async {
         final jsonData = jsonDecode(value.body);
+        customPrint("sendChatToApi response :: ${value.body}");
+        
         if (jsonData["status"].toString() != "true") {
-          showErrorMessage(jsonData["message"], colorError);
-          customPrint("sendChatToApi response :: ${value.body}");
-          customPrint("sendChatToApi message::${jsonData["message"]}");
+          // Handle null message safely
+          String errorMessage = "Unknown error occurred";
+          if (jsonData["message"] != null) {
+            errorMessage = jsonData["message"].toString();
+          }
+          showErrorMessage(errorMessage, colorError);
+          customPrint("sendChatToApi error message:: $errorMessage");
           return false;
         } else {
-          // showSucessMessage(jsonData["message"], colorSuccess);
+          // Success case - handle null message safely
+          String successMessage = "Chat sent successfully";
+          if (jsonData["message"] != null) {
+            successMessage = jsonData["message"].toString();
+          }
+          customPrint("sendChatToApi success:: $successMessage");
+          // showSucessMessage(successMessage, colorSuccess);
         }
-        customPrint("sendChatToApi::${value.body}");
         return true;
       });
     } on Exception catch (e) {
-      customPrint("Error :: $e");
+      customPrint("sendChatToApi Error :: $e");
       // showSnackbar(
       //     context,
       //     "Some unknown error has occur, try again after some time",
@@ -214,6 +230,7 @@ class ChatController {
 
   static Rx<GetChatFromApiByCharacterId> getChatFromApiModel =
       GetChatFromApiByCharacterId().obs;
+
   static Future<bool> getChatFromApi(String id, String page) async {
     final headers = {
       "Content-Type": "application/json",
@@ -225,14 +242,16 @@ class ChatController {
       return await http
           .get(Uri.parse(url), headers: headers)
           .then((value) async {
-        print("getChatFromApi :: ${value.body}");
+        print("getChatFromApi :: ${value.statusCode}");
         final jsonData = jsonDecode(value.body);
+        customPrint("getChatFromApi jsonData : ${jsonData['status']}");
         if (jsonData["status"].toString() != "true") {
           showErrorMessage(jsonData["message"].toString(), colorError);
           return false;
         }
         //showSnackbar("Subscription PlanPrice Details Added Successfully", colorSuccess);
         getChatFromApiModel(getChatFromApiByCharacterIdFromJson(value.body));
+        customPrint("This is character summary value : ${getChatFromApiModel}");
         return true;
       });
     } on Exception catch (e) {

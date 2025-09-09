@@ -1,0 +1,225 @@
+import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+import '../models/admin_state.dart';
+import '../models/dialogue_node.dart';
+import 'node_editor.dart';
+import 'node_graph.dart';
+
+class DialogueEditorStep extends StatefulWidget {
+  final AdminState adminState;
+  
+  const DialogueEditorStep({
+    Key? key,
+    required this.adminState,
+  }) : super(key: key);
+
+  @override
+  _DialogueEditorStepState createState() => _DialogueEditorStepState();
+}
+
+class _DialogueEditorStepState extends State<DialogueEditorStep> {
+  final Uuid _uuid = const Uuid();
+  bool _showGraphView = true;
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with instructions and view toggle
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Dialogue Editor',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            ToggleButtons(
+              isSelected: [_showGraphView, !_showGraphView],
+              onPressed: (index) {
+                setState(() {
+                  _showGraphView = index == 0;
+                });
+              },
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.account_tree),
+                      SizedBox(width: 8),
+                      Text('Graph View'),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.list),
+                      SizedBox(width: 8),
+                      Text('List View'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 16),
+        
+        // Instructions
+        const Card(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Creating Your Dialogue Flow',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  '1. Create nodes for each part of your story dialogue\n'
+                  '2. Connect nodes with choices to create branching paths\n'
+                  '3. Add character dialogue and expressions in each node\n'
+                  '4. Include stat changes to track player progress\n'
+                  '5. Preview your story flow in the graph view'
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        const SizedBox(height: 16),
+        
+        // Action buttons
+        Row(
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.add),
+              label: const Text('Add Node'),
+              onPressed: _addNewNode,
+            ),
+            const SizedBox(width: 16),
+            if (widget.adminState.activeNode != null)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.edit),
+                label: const Text('Edit Selected Node'),
+                onPressed: _editSelectedNode,
+              ),
+            const SizedBox(width: 16),
+            if (widget.adminState.activeNode != null)
+              ElevatedButton.icon(
+                icon: const Icon(Icons.delete),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                label: const Text('Delete Node'),
+                onPressed: _deleteSelectedNode,
+              ),
+          ],
+        ),
+        
+        const SizedBox(height: 16),
+        
+        // Main editor area
+        Expanded(
+          child: _showGraphView 
+              ? NodeGraphView(
+                  nodes: widget.adminState.storyModule.nodes,
+                  onNodeSelected: (node) => setState(() {
+                    widget.adminState.setActiveNode(node);
+                  }),
+                  activeNodeId: widget.adminState.activeNode?.id,
+                )
+              : NodeListView(
+                  nodes: widget.adminState.storyModule.nodes,
+                  onNodeSelected: (node) => setState(() {
+                    widget.adminState.setActiveNode(node);
+                  }),
+                  activeNodeId: widget.adminState.activeNode?.id,
+                ),
+        ),
+      ],
+    );
+  }
+  
+  void _addNewNode() {
+    final newNode = DialogueNode(
+      id: 'node_${_uuid.v4()}',
+      title: 'New Node ${widget.adminState.storyModule.nodes.length + 1}',
+      sceneId: widget.adminState.storyModule.scenes.isNotEmpty 
+          ? widget.adminState.storyModule.scenes.first.id 
+          : '',
+      characterId: widget.adminState.storyModule.characters.isNotEmpty 
+          ? widget.adminState.storyModule.characters.first.id 
+          : '',
+      expression: 'neutral',
+      lines: [
+        DialogueLine(
+          id: 'line_${_uuid.v4()}',
+          speakerId: widget.adminState.storyModule.characters.isNotEmpty 
+              ? widget.adminState.storyModule.characters.first.id 
+              : '',
+          text: 'Enter dialogue here...',
+        ),
+      ],
+      choices: [],
+      statChanges: [],
+    );
+    
+    widget.adminState.addNode(newNode);
+    widget.adminState.setActiveNode(newNode);
+    
+    _editSelectedNode();
+  }
+  
+  void _editSelectedNode() {
+    if (widget.adminState.activeNode == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) => NodeEditorDialog(
+        node: widget.adminState.activeNode!,
+        characters: widget.adminState.storyModule.characters,
+        scenes: widget.adminState.storyModule.scenes,
+        stats: widget.adminState.storyModule.stats,
+        allNodes: widget.adminState.storyModule.nodes,
+        onSave: (updatedNode) {
+          widget.adminState.updateNode(updatedNode);
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
+  
+  void _deleteSelectedNode() {
+    if (widget.adminState.activeNode == null) return;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Node'),
+        content: Text(
+          'Are you sure you want to delete "${widget.adminState.activeNode!.title}"? '
+          'This action cannot be undone.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              widget.adminState.removeNode(widget.adminState.activeNode!.id);
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+}

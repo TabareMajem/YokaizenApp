@@ -50,6 +50,46 @@ final Map<String, String> ko = {
   "Forgot Password": "비밀번호 찾기",
   "We will send you the link to reset password on your registered phone number":
       "등록된 전화번호로 비밀번호 재설정 링크를 보내드립니다.",
+  "We will help you recover your account. Enter your email address below.":
+      "계정 복구를 도와드리겠습니다. 아래에 이메일 주소를 입력하세요.",
+  "Check Account": "계정 확인",
+  "Checking...": "확인 중...",
+  "No account found with this email address. Please check your email or create a new account.":
+      "이 이메일 주소로 등록된 계정을 찾을 수 없습니다. 이메일을 확인하거나 새 계정을 만드세요.",
+  "An error occurred while checking your account. Please try again.":
+      "계정을 확인하는 중 오류가 발생했습니다. 다시 시도해 주세요.",
+  "This account was created with Google Sign-In. Please use 'Sign in with Google' instead of email/password.":
+      "이 계정은 Google 로그인으로 생성되었습니다. 이메일/비밀번호 대신 'Google로 로그인'을 사용하세요.",
+  "This account uses email/password authentication. You can reset your password.":
+      "이 계정은 이메일/비밀번호 인증을 사용합니다. 비밀번호를 재설정할 수 있습니다.",
+  "This account was created with Apple Sign-In. Please use 'Sign in with Apple' instead of email/password.":
+      "이 계정은 Apple 로그인으로 생성되었습니다. 이메일/비밀번호 대신 'Apple로 로그인'을 사용하세요.",
+  "This account exists but uses a different sign-in method.":
+      "이 계정은 존재하지만 다른 로그인 방법을 사용합니다.",
+  "Google Account Detected": "Google 계정이 감지되었습니다",
+  "This email address is associated with a Google account.":
+      "이 이메일 주소는 Google 계정과 연결되어 있습니다.",
+  "To access your account, please use \"Sign in with Google\" instead of email/password.":
+      "계정에 액세스하려면 이메일/비밀번호 대신 \"Google로 로그인\"을 사용하세요.",
+  "Go Back": "뒤로",
+  "Sign in with Google": "Google로 로그인",
+  "Account Information": "계정 정보",
+  "Your account was created using a different sign-in method.":
+      "귀하의 계정은 다른 로그인 방법으로 생성되었습니다.",
+  "Please use the same sign-in method you used when creating your account.":
+      "계정을 만들 때 사용한 것과 같은 로그인 방법을 사용하세요.",
+  "OK": "확인",
+  "Failed to send reset email. Please try again.":
+      "재설정 이메일 전송에 실패했습니다. 다시 시도해 주세요.",
+  "This email is registered with a Google account": "이 이메일은 Google 계정으로 등록되어 있습니다",
+  "This email is registered with an Apple account": "이 이메일은 Apple 계정으로 등록되어 있습니다",
+  "This email is registered with email/password": "이 이메일은 이메일/비밀번호로 등록되어 있습니다",
+  "Please use Google Sign-In to access your account": "계정에 액세스하려면 Google 로그인을 사용하세요",
+  "Please use Apple Sign-In to access your account": "계정에 액세스하려면 Apple 로그인을 사용하세요",
+  "You can reset your password for this account": "이 계정의 비밀번호를 재설정할 수 있습니다",
+  "Account type detected": "계정 유형이 감지되었습니다",
+  "No account found with this email": "이 이메일로 등록된 계정을 찾을 수 없습니다",
+  "Please check your email address or create a new account": "이메일 주소를 확인하거나 새 계정을 만드세요",
   "Send Email": "이메일 보내기",
   "Reset Link Sent !": "재설정 링크가 전송되었습니다!",
   "Please check your registered email for the password reset link and steps. \n\nYou can log in with the new password once it has been reset. ":
@@ -182,6 +222,7 @@ final Map<String, String> ko = {
   "End Test?": "테스트 종료?",
   "Are you sure you want to end this test?\nYou will not be able to change answers once you \npress “Confirm”":
       "이 테스트를 종료하시겠습니까?\n“확인”을 누르면 답변을 변경할 수 없습니다.",
+  "Drop zones:" : "드롭 존:",
   "Cancel": "취소",
   "Confirm": "확인",
   "Playing...": "재생 중...",
@@ -269,7 +310,7 @@ final Map<String, String> ko = {
   "Invite your friends": "친구 초대하기",
   "You're on a wonderful path! Your day is going amazing Keep this positive energy flowing and remember what contributed to this great mood.": 
     "멋진 길을 걷고 있어요! 오늘 하루가 정말 멋지네요. 이 긍정적인 에너지를 유지하고, 이 좋은 기분에 기여한 것을 기억하세요.",
-  "You’re on a ": "당신은",
+  "You're on a ": "당신은",
   "good way!": "좋은 길을 걷고 있어요!",
   "You're on a good way! Your day shows promise Notice the positive choices you're making today.": 
     "좋은 길을 걷고 있어요! 오늘 하루는 희망적이에요. 오늘 당신이 하고 있는 긍정적인 선택에 주목하세요.",
@@ -296,5 +337,63 @@ final Map<String, String> ko = {
   "Please complete the quiz to get the data": "퀴즈를 완료하여 결과를 얻으세요",
   "Your Login is expired please login again": "로그인 세션이 만료되었습니다. 다시 로그인하세요.",
   "Today": "오늘",
-  "Yokai is typing please wait": "요카이가 입력 중입니다. 잠시 기다려주세요."
+  "Yokai is typing please wait": "요카이가 입력 중입니다. 잠시 기다려주세요.",
+  "Ring" : "반지",
+  "Ring Data": "링 데이터",
+  "Connected": "연결됨",
+  "Disconnected": "연결 해제됨",
+  "Not Connected": "연결 안 됨",
+  "Please connect your smart ring to track health metrics and sleep data": "건강 지표 및 수면 데이터를 추적하려면 스마트 링을 연결해주세요",
+  "Scan for Devices": "기기 검색",
+
+  "Scanning for Devices": "기기 스캔 중",
+  "Please wait while we look for nearby devices": "주변 기기를 찾는 중입니다. 잠시 기다려주세요",
+  "Rescan": "다시 스캔",
+  "Connecting": "연결 중",
+  "Connecting to": "에 연결 중",
+  "Success": "성공",
+  "Error": "오류",
+  "Day": "일",
+  "Week": "주",
+  "Month": "월",
+  "Heart Rate": "심박수",
+  "SPO2": "혈중 산소 포화도",
+  "Steps": "걸음 수",
+  "Stress": "스트레스",
+  "Health Trends": "건강 트렌드",
+  "No data available": "사용 가능한 데이터가 없습니다",
+  "Sleep Analysis": "수면 분석",
+  "No sleep data available": "수면 데이터가 없습니다",
+  "Duration": "기간",
+  "Quality": "품질",
+  "Device Info": "기기 정보",
+  "Address": "주소",
+  "Auto-reconnect": "자동 재연결",
+  "Connection lost": "연결 끊김",
+  "Battery": "배터리",
+  "Disconnect": "연결 해제",
+  "Find Ring": "링 찾기",
+  "Smart ring registered successfully": "스마트 링이 성공적으로 등록되었습니다",
+  "Smart ring is already registered for this user": "이 사용자에게는 스마트 링이 이미 등록되어 있습니다",
+  "Session expired. Please log in again": "세션이 만료되었습니다. 다시 로그인해주세요",
+  "Failed to register ring": "링 등록에 실패했습니다",
+  "Server error occurred": "서버 오류가 발생했습니다",
+  "Low": "낮음",
+  "Connected to saved device": "저장된 기기에 연결됨",
+  "already registered": "이미 등록됨",
+  "the device is already registered for this user": "이 기기는 이미 이 사용자에게 등록되어 있습니다",
+  "Failed to connect to the device. Please try again.": "기기 연결에 실패했습니다. 다시 시도해주세요.",
+  "Device is already registered for this user": "이 기기는 이미 이 사용자에게 등록되어 있습니다",
+  "Error checking device": "기기 확인 중 오류 발생",
+  "Connection failed": "연결 실패",
+  "API Error": "API 오류",
+  "Device not found or doesn't belong to this user": "기기를 찾을 수 없거나 이 사용자에게 속하지 않습니다",
+  "Firmware": "펌웨어",
+  "Sync Health Data": "건강 데이터 동기화",
+  "Delete This Ring": "이 링 삭제",
+  "Update Firmware (Simulated)": "펌웨어 업데이트 (시뮬레이션)",
+  "Searching for devices...": "기기 검색 중...",
+  "Delete Ring": "링 삭제",
+  "Are you sure you want to delete this ring? This action cannot be undone.": "이 링을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+  "Delete": "삭제"
 };

@@ -9,6 +9,8 @@ import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
 import 'package:yokai_quiz_app/util/text_styles.dart';
 
+import '../../../services/purchase_service.dart';
+
 class ViewProfilePage extends StatefulWidget {
   const ViewProfilePage({super.key});
 
@@ -132,6 +134,9 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
                         ),
                         3.ph,
                         GestureDetector(
+                          onTap: () {
+                            PurchaseService.showHostedPaywall(context);
+                          },
                           child: Container(
                             width: 150,
                             padding: const EdgeInsets.symmetric(

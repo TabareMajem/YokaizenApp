@@ -1,0 +1,47 @@
+{
+  "chapters": {
+    "chapter1": {
+      "id": "chapter1",
+      "title": "Strange Beginnings",
+      "startNode": "Chapter1_Start",
+      "requiredAssets": {
+        "backgrounds": [
+          "school_entrance_morning",
+          "classroom_day",
+          "storage_room"
+        ],
+        "characters": ["hana", "mei", "yuto"],
+        "music": ["school_theme", "mystery_theme"],
+        "sfx": ["artifact_glow", "door_open"]
+      }
+    },
+    "chapter2": {
+      "id": "chapter2",
+      "title": "The Time Shard",
+      "startNode": "Chapter2_Start",
+      "requiredAssets": {
+        "backgrounds": [
+          "classroom_morning",
+          "storage_room"
+        ],
+        "characters": ["hana", "mei"],
+        "music": ["mystery_theme"],
+        "sfx": ["time_shard_activate"]
+      }
+    },
+    "chapter3": {
+      "id": "chapter3",
+      "title": "Mirror of Truth",
+      "startNode": "Chapter3_Start",
+      "requiredAssets": {
+        "backgrounds": [
+          "school_entrance_afternoon",
+          "old_library"
+        ],
+        "characters": ["hana", "mei"],
+        "music": ["mystery_theme"],
+        "sfx": ["mirror_reveal"]
+      }
+    }
+  }
+}

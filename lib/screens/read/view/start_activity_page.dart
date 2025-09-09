@@ -1,10 +1,12 @@
+/// start_activity_page.dart
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:yokai_quiz_app/Widgets/progressHud.dart';
 import 'package:yokai_quiz_app/screens/read/view/quiz_page.dart';
-import 'package:yokai_quiz_app/screens/read/view/read_stories_page.dart';
+import 'package:yokai_quiz_app/screens/read/view/read_stories_screen.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
 import 'package:yokai_quiz_app/util/constants.dart';
@@ -23,9 +25,9 @@ class StartActivityPage extends StatefulWidget {
 
   StartActivityPage(
       {super.key,
-      required this.chapter,
-      required this.chapterId,
-      this.storyName});
+        required this.chapter,
+        required this.chapterId,
+        this.storyName});
 
   @override
   State<StartActivityPage> createState() => _StartActivityPageState();
@@ -51,8 +53,9 @@ class _StartActivityPageState extends State<StartActivityPage> {
   fetchActivityData() async {
     isLoading(true);
     await ReadController.getActivityDetailsByChapterId(widget.chapterId).then(
-      (value) {
+          (value) {
         isLoading(false);
+
       },
     );
     ReadController.chapterName('');
@@ -67,7 +70,9 @@ class _StartActivityPageState extends State<StartActivityPage> {
 
   @override
   Widget build(BuildContext context) {
+    customPrint("build got invoked Test print : ${ReadController.getActivityByChapterId.value.data?[0].details![0].srNo}");
     final screenSize = MediaQuery.of(context).size;
+    var title = ReadController.getActivityByChapterId.value.data?[0].title;
     return WillPopScope(
       onWillPop: () async {
         showDialog(
@@ -81,7 +86,7 @@ class _StartActivityPageState extends State<StartActivityPage> {
                   width: MediaQuery.of(context).size.width / 1.4,
                   height: MediaQuery.of(context).size.height / 3,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(15.0),
@@ -130,7 +135,7 @@ class _StartActivityPageState extends State<StartActivityPage> {
                               // Get.back();
                               nextPageOff(
                                   context,
-                                  ReadStoriesPage(
+                                  ReadStoriesScreen(
                                       storyName: widget.chapter,
                                       chapterId: widget.chapterId));
                             },
@@ -184,19 +189,19 @@ class _StartActivityPageState extends State<StartActivityPage> {
                                     elevation: 1,
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
-                                            BorderRadius.circular(15)),
+                                        BorderRadius.circular(15)),
                                     child: Container(
                                       width: MediaQuery.of(context).size.width /
                                           1.4,
                                       height:
-                                          MediaQuery.of(context).size.height /
-                                              3,
+                                      MediaQuery.of(context).size.height /
+                                          3,
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 15, vertical: 10),
                                       decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius:
-                                              BorderRadius.circular(15.0),
+                                          BorderRadius.circular(15.0),
                                           boxShadow: [
                                             BoxShadow(
                                                 offset: const Offset(12, 26),
@@ -207,9 +212,9 @@ class _StartActivityPageState extends State<StartActivityPage> {
                                           ]),
                                       child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        MainAxisAlignment.center,
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Image.asset(
                                             "images/appLogo_yokai.png",
@@ -238,7 +243,7 @@ class _StartActivityPageState extends State<StartActivityPage> {
                                           ),
                                           Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
+                                            MainAxisAlignment.spaceEvenly,
                                             children: [
                                               SecondCustomButton(
                                                 onPressed: () {
@@ -246,9 +251,9 @@ class _StartActivityPageState extends State<StartActivityPage> {
                                                   // Get.back();
                                                   nextPageOff(
                                                       context,
-                                                      ReadStoriesPage(
+                                                      ReadStoriesScreen(
                                                           storyName:
-                                                              widget.chapter,
+                                                          widget.chapter,
                                                           chapterId: widget
                                                               .chapterId));
                                                 },
@@ -268,7 +273,7 @@ class _StartActivityPageState extends State<StartActivityPage> {
                                                     color: colorBorder),
                                                 width: screenSize.width / 4,
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                MainAxisAlignment.center,
                                               ),
                                             ],
                                           ),
@@ -300,53 +305,53 @@ class _StartActivityPageState extends State<StartActivityPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: ((ReadController.getActivityByChapterId.value
-                                          .data?[0].activityImage
-                                          .toString() ??
-                                      '') !=
-                                  '' &&
-                              (ReadController.getActivityByChapterId.value
-                                          .data?[0].activityImage
-                                          .toString() ??
-                                      '') !=
-                                  'null')
+                          .data?[0].activityImage
+                          .toString() ??
+                          '') !=
+                          '' &&
+                          (ReadController.getActivityByChapterId.value
+                              .data?[0].activityImage
+                              .toString() ??
+                              '') !=
+                              'null')
                           ? ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child:
-                                  // Image.network(
-                                  //     '${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].activityImage.toString() ?? ''}',
-                                  // width: screenSize.width,
-                                  // fit: BoxFit.fill,
-                                  //   ),
-                                  CachedNetworkImage(
-                                imageUrl:
-                                    "${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].activityImage.toString() ?? ''}",
-                                // placeholder: (context, url) => CircularProgressIndicator(),
-                                placeholder: (context, url) => const Padding(
-                                  padding: EdgeInsets.all(
-                                      constants.defaultPadding * 2),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      CircularProgressIndicator(),
-                                    ],
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(
-                                  Icons.error,
-                                  color: AppColors.black,
-                                ),
-                                width: screenSize.width,
-                                fit: BoxFit.fill,
-                                // fit: BoxFit.contain,
-                              ),
-                            )
-                          : Center(
-                              child: Text(
-                                'Photo Not Added'.tr,
-                              ),
+                        borderRadius: BorderRadius.circular(8),
+                        child:
+                        // Image.network(
+                        //     '${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].activityImage.toString() ?? ''}',
+                        // width: screenSize.width,
+                        // fit: BoxFit.fill,
+                        //   ),
+                        CachedNetworkImage(
+                          imageUrl:
+                          "${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].activityImage.toString() ?? ''}",
+                          // placeholder: (context, url) => CircularProgressIndicator(),
+                          placeholder: (context, url) => const Padding(
+                            padding: EdgeInsets.all(
+                                constants.defaultPadding * 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircularProgressIndicator(),
+                              ],
                             ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                          const Icon(
+                            Icons.error,
+                            color: AppColors.black,
+                          ),
+                          width: screenSize.width,
+                          fit: BoxFit.fill,
+                          // fit: BoxFit.contain,
+                        ),
+                      )
+                          : Center(
+                        child: Text(
+                          'Photo Not Added'.tr,
+                        ),
+                      ),
                       // Image.asset(
                       //   'icons/bear.png',
                       //   width: screenSize.width,
@@ -355,103 +360,108 @@ class _StartActivityPageState extends State<StartActivityPage> {
                     ),
                     2.ph,
                     Text(
-                      'Healthy Coping Mechanisms Quiz'.tr,
+                      ReadController.getActivityByChapterId.value.data![0].title!,
                       style:
-                          AppTextStyle.normalBold16.copyWith(color: indigo950),
+                      AppTextStyle.normalBold16.copyWith(color: indigo950),
                     ),
                     2.ph,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          height: 70,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: indigo200),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            height: 70,
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: indigo200),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Time'.tr,
+                                  style: AppTextStyle.normalRegular12
+                                      .copyWith(color: grey2),
+                                ),
+                                0.5.ph,
+                                Text(
+                                  (ReadController.getActivityByChapterId.value.data?[0].time.toString() ?? '') + 'Minutes'.tr,
+                                  style: AppTextStyle.normalRegular12
+                                      .copyWith(color: coral500),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Time'.tr,
-                                style: AppTextStyle.normalRegular12
-                                    .copyWith(color: grey2),
-                              ),
-                              0.5.ph,
-                              Text(
-                                '${ReadController.getActivityByChapterId.value.data?[0].time.toString() ?? ''} Minutes',
-                                style: AppTextStyle.normalRegular12
-                                    .copyWith(color: coral500),
-                              ),
-                            ],
+                          const SizedBox(width: 20,),
+                          Container(
+                            height: 70,
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: indigo200),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Type'.tr,
+                                  style: AppTextStyle.normalRegular12
+                                      .copyWith(color: grey2),
+                                ),
+                                0.5.ph,
+                                Text(
+                                  'Quiz'.tr,
+                                  style: AppTextStyle.normalRegular12
+                                      .copyWith(color: coral500),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Container(
-                          height: 70,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: indigo200),
+                          const SizedBox(width: 20,),
+                          Container(
+                            height: 70,
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: indigo200),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Chapter'.tr,
+                                  style: AppTextStyle.normalRegular12
+                                      .copyWith(color: grey2),
+                                ),
+                                0.5.ph,
+                                Text(
+                                  ReadController.getActivityByChapterId.value
+                                      .data?[0].chapterName
+                                      .toString() ??
+                                      '',
+                                  style: AppTextStyle.normalRegular12
+                                      .copyWith(color: coral500),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Type'.tr,
-                                style: AppTextStyle.normalRegular12
-                                    .copyWith(color: grey2),
-                              ),
-                              0.5.ph,
-                              Text(
-                                'Quiz'.tr,
-                                style: AppTextStyle.normalRegular12
-                                    .copyWith(color: coral500),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: 70,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: indigo200),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Chapter'.tr,
-                                style: AppTextStyle.normalRegular12
-                                    .copyWith(color: grey2),
-                              ),
-                              0.5.ph,
-                              Text(
-                                ReadController.getActivityByChapterId.value
-                                        .data?[0].chapterName
-                                        .toString() ??
-                                    '',
-                                style: AppTextStyle.normalRegular12
-                                    .copyWith(color: coral500),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     2.ph,
                     Text(
                       // "Feeling stressed? It happens to everyone!\nBut how we handle those tough moments can make a\nbig difference.\nThis short quiz will explore your coping mechanisms\nand see if you have a healthy toolbox for dealing with\nlife's challenges.\nLet's see if your go-to strategies are helping you thrive!",
                       ReadController.getActivityByChapterId.value.data?[0]
-                              .shortDiscription
-                              .toString() ??
+                          .shortDiscription
+                          .toString() ??
                           '',
                       style:
-                          AppTextStyle.normalRegular12.copyWith(color: grey2),
+                      AppTextStyle.normalRegular12.copyWith(color: grey2),
                     ),
                     3.ph,
                     Text(
@@ -459,49 +469,9 @@ class _StartActivityPageState extends State<StartActivityPage> {
                       style: AppTextStyle.normalRegular12
                           .copyWith(color: coral500),
                     ),
-                    1.ph,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${ReadController.getActivityByChapterId.value.data?[0].characterName.toString() ?? ''}',
-                          style: AppTextStyle.normalBold12
-                              .copyWith(color: indigo700),
-                        ),
-                        1.pw,
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(35),
-                          // half of the height/width
-                          child: CachedNetworkImage(
-                            imageUrl:
-                                "${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].characterImage.toString() ?? ''}",
-                            placeholder: (context, url) => const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircularProgressIndicator(),
-                              ],
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              decoration:
-                                  const BoxDecoration(color: AppColors.red),
-                              child: const Icon(
-                                Icons.error_outline,
-                                color: AppColors.black,
-                              ),
-                            ),
-                            height: 45,
-                            width: 45,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        // CircleAvatar(
-                        //   backgroundColor: colorWhite,
-                        //   radius: 25,
-                        //   child: Image.asset("icons/buddies.png"),
-                        // ),
-                      ],
-                    ),
+                    2.ph,
+                    getCharactersDetails(),
+                    2.ph,
                     if (ReadController.isActivityAvailable.isTrue)
                       SecondCustomButton(
                         onPressed: () {
@@ -511,6 +481,7 @@ class _StartActivityPageState extends State<StartActivityPage> {
                           nextPage(QuizPage(
                             chapterId: widget.chapterId,
                             chapter: widget.chapter,
+                            title: title!,
                           ));
                         },
                         width: screenSize.width / 2,
@@ -527,4 +498,53 @@ class _StartActivityPageState extends State<StartActivityPage> {
       }),
     );
   }
+
+  Widget getCharactersDetails() {
+    Widget character = Container();
+    var characterName = ReadController.getActivityByChapterId.value.data?[0].characterName;
+    var characterImage = ReadController.getActivityByChapterId.value.data?[0].characterImage;
+    if(characterName != null && characterName.isNotEmpty &&
+        characterImage != null && characterImage.isNotEmpty) {
+      customPrint("inside if condition of the getCharactersDetails method");
+      character = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            '${ReadController.getActivityByChapterId.value.data?[0].characterName.toString() ?? ''}',
+            style: AppTextStyle.normalBold12
+                .copyWith(color: indigo700),
+          ),
+          1.pw,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(35),
+            // half of the height/width
+            child: CachedNetworkImage(
+              imageUrl:
+              "${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].characterImage.toString() ?? ''}",
+              placeholder: (context, url) => const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                ],
+              ),
+              errorWidget: (context, url, error) => Container(
+                decoration:
+                const BoxDecoration(color: AppColors.red),
+                child: const Icon(
+                  Icons.error_outline,
+                  color: AppColors.black,
+                ),
+              ),
+              height: 45,
+              width: 45,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
+      );
+    }
+    return character;
+  }
+
 }

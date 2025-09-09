@@ -1,0 +1,149 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "B7A24EC4",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : {
+          "index" : 1,
+          "type" : "purchase"
+        },
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "6CD6ECBC",
+      "localizations" : [
+
+      ],
+      "name" : "Yokaizen Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "6.75",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "D398EE9F",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "ykz_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Yokaizen Monthly, 1000¥, 7 days free trial",
+          "subscriptionGroupID" : "6CD6ECBC",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "67.48",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "D27B1525",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "ykz_annual",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yokaizen Annual, 10000¥, 7 days free trial ",
+          "subscriptionGroupID" : "6CD6ECBC",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "subscriptionOffersKeyPair" : {
+    "id" : "ACBC2B7C",
+    "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgkJp/avBr7QSjeeOWYLBLCq3RW0Ki1AdHNrdO1T5qhjegCgYIKoZIzj0DAQehRANCAAS0eei2HwfMc3LBhUlNk0W6zwAzH8RU13WH2YHDUNqfKDIBR/fOypAf3PFOfH42NFj9FQTx4HEMT/sRWZx2NdTU"
+  },
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

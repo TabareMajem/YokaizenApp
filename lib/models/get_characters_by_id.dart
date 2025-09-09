@@ -72,22 +72,19 @@ class Data {
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         id: json["id"],
-        name: constants.deviceLanguage == "en"
-            ? fixEncoding(json["name"])
-            : fixEncoding(json["japanese_name"]),
-        storiesId: json["stories_id"].toString(),
+        name: constants.deviceLanguage == "en" ? json["name"] ?? "" :  fixEncoding(json["name"]) ?? "",
+        storiesId: json["stories_id"] != null ? json["stories_id"].toString() : null,
         link: json["link"],
-        introduction: constants.deviceLanguage == "en"
-            ? json["introduction"]
-            : fixEncoding(json["japanese_introduction"]),
+        introduction: constants.deviceLanguage == "en" ? fixEncoding(json["introduction"]) ?? "" :  fixEncoding(json["introduction"]) ?? "",
         characterImage: json["character_image"],
-        requirements:constants.deviceLanguage == "en"
-            ? json["requirements"]:fixEncoding(json["japanese_requirements"]),
+        requirements: constants.deviceLanguage == "en" ? json["requirements"] ?? "" :  fixEncoding(json["requirements"]) ?? "",
         prompt: json["prompt"],
         tags: json["tags"] == null
             ? []
-            : List<String>.from(json["tags"]!.map((x) => x)),
-        storyName: json["story_name"],
+            : List<String>.from(json["tags"]!.map((x) => (x))),
+        storyName: constants.deviceLanguage == "en" 
+            ? json["story_name"] 
+            : (json["story_name"] != null ? fixEncoding(json["story_name"]) : null),
         totalChapter: json["total_chapter"],
         totalReadChapter: json["total_read_chapter"],
         createdAt: json["created_at"] == null

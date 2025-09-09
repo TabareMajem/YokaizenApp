@@ -1,0 +1,36 @@
+title: Start
+---
+Narrator: Welcome to your visual novel.
+CharacterA: Hello there! How are you today?
+-> I'm doing well, thanks!
+    CharacterA: That's great to hear!
+-> I've been better...
+    CharacterA: Oh, I'm sorry to hear that.
+CharacterA: Would you like to go for a walk?
+-> Yes, let's go!
+    <<jump WalkScene>>
+-> No, I'd rather stay here.
+    CharacterA: That's fine too. Let's chat here then.
+    <<jump StayScene>>
+===
+
+title: WalkScene
+---
+Narrator: You decide to go for a walk together.
+CharacterA: The weather is lovely today, isn't it?
+-> It's perfect!
+    CharacterA: I agree!
+-> It's a bit too hot for my taste.
+    CharacterA: We can find some shade if you'd like.
+CharacterA: Look at those beautiful trees.
+===
+
+title: StayScene
+---
+Narrator: You decide to stay and chat.
+CharacterA: Would you like some tea?
+-> Yes, please.
+    CharacterA: I'll prepare some for us.
+-> No thanks, I'm good.
+    CharacterA: Alright, just let me know if you change your mind.
+===

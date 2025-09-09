@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SDKSample</string>
+    <string name="text_1">扫描</string>
+    <string name="text_2">重连</string>
+    <string name="text_3">断开</string>
+    <string name="text_4">设置时间</string>
+    <string name="text_5">查找手表</string>
+    <string name="text_6">电量</string>
+    <string name="text_7">小时,公英制</string>
+    <string name="text_8">消息推送测试</string>
+    <string name="text_9">读闹钟</string>
+    <string name="text_10">写闹钟</string>
+    <string name="text_11">血氧</string>
+    <string name="text_12">拍照</string>
+    <string name="text_13">音乐</string>
+    <string name="text_14">电话</string>
+    <string name="text_15">设置目标</string>
+    <string name="text_16">表盘</string>
+    <string name="text_17">睡眠</string>
+    <string name="text_18">计算睡眠</string>
+    <string name="text_19">手动心率</string>
+    <string name="text_20">手动血压</string>
+    <string name="text_21">手动血氧</string>
+    <string name="text_22">连接中...</string>
+    <string name="text_23">获取消息推送开关</string>
+    <string name="text_24">设置消息推送开关</string>
+    <string name="text_25">同步自动体温</string>
+    <string name="text_26">同步手动体温</string>
+    <string name="text_27">设置个人信息</string>
+    <string name="text_28">同步个人信息</string>
+    <string name="text_29">添加监听</string>
+    <string name="text_30">移除监听</string>
+    <string name="text_31">移除所有监听</string>
+    <string name="text_32">OTA</string>
+    <string name="text_33">选择文件</string>
+    <string name="text_34">开始升级</string>
+
+</resources>

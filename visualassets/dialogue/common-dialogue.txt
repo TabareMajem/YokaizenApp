@@ -1,0 +1,8 @@
+title: Start
+---
+<<declare $player_name = "Player">>
+<<declare $chapter_progress = 0>>
+<<declare $seen_artifact = false>>
+<<declare $time_shard_activated = false>>
+<<declare $empathy_mirror_found = false>>
+===

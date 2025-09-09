@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'package:yokai_quiz_app/screens/read/view/read_stories_page.dart';
+import 'package:yokai_quiz_app/screens/read/view/read_stories_screen.dart';
 import 'package:yokai_quiz_app/screens/read/view/start_activity_page.dart';
 import 'package:yokai_quiz_app/util/colors.dart';
 import 'package:yokai_quiz_app/util/const.dart';
@@ -18,20 +18,24 @@ import '../controller/read_controller.dart';
 class CongratulationPage extends StatefulWidget {
   String? score;
   String length;
+  String? title;
 
-  CongratulationPage({super.key, required this.length, this.score});
+
+  CongratulationPage({super.key, required this.length, this.score, this.title});
 
   @override
   State<CongratulationPage> createState() => _CongratulationPageState();
 }
 
 class _CongratulationPageState extends State<CongratulationPage> {
+  String title = "";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     customPrint("chapterName :: ${ReadController.chapterName.value}");
     customPrint("chapterId ::${ReadController.chapterId.value}");
+    if(widget.title!.isNotEmpty && widget.title != null) title = widget.title!;
   }
 
   @override
@@ -54,39 +58,43 @@ class _CongratulationPageState extends State<CongratulationPage> {
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(
-                  right: 20, left: 20, bottom: 16, top: 60),
+                  right: 20, left: 20, bottom: 16, top: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   3.ph,
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          // Get.back();
-                          nextPageOff(
-                              context,
-                              StartActivityPage(
-                                  chapter: ReadController.chapterName.value,
-                                  chapterId: ReadController.chapterId.value));
-                          ReadController.chapterName('');
-                          ReadController.chapterId('');
-                        },
-                        child: SvgPicture.asset(
-                          'icons/arrowLeft.svg',
-                          height: 35,
-                          width: 35,
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            // Get.back();
+                            nextPageOff(
+                                context,
+                                StartActivityPage(
+                                    chapter: ReadController.chapterName.value,
+                                    chapterId: ReadController.chapterId.value));
+                            ReadController.chapterName('');
+                            ReadController.chapterId('');
+                          },
+                          child: SvgPicture.asset(
+                            'icons/arrowLeft.svg',
+                            height: 35,
+                            width: 35,
+                          ),
                         ),
-                      ),
-                      1.pw,
-                      Center(
-                        child: Text(
-                          'Healthy Coping Mechanisms Quiz'.tr,
-                          style: AppTextStyle.normalBold16
-                              .copyWith(color: coral500),
+                        1.pw,
+                        Center(
+                          child: Text(
+                            // 'Healthy Coping Mechanisms Quiz'.tr,
+                            title,
+                            style: AppTextStyle.normalBold16
+                                .copyWith(color: coral500),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   5.ph,
                   Stack(
@@ -171,166 +179,174 @@ class _CongratulationPageState extends State<CongratulationPage> {
                                         .data?[0].readChapterCount ??
                                     0) <
                                 3)
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width / 1.1,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Stack(
-                                            alignment: Alignment.centerLeft,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal:
-                                                        screenSize.width / 9),
-                                                child: Column(
-                                                  children: [
-                                                    Text(
-                                                      "Only a few more chapters to unlock : "
-                                                          .tr,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: AppTextStyle
-                                                          .normalBold12
-                                                          .copyWith(
-                                                              color: greyCh),
-                                                    ),
-                                                    4.ph,
-                                                  ],
-                                                ),
-                                              ),
-                                              Stack(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                children: [
-                                                  SliderTheme(
-                                                    data: const SliderThemeData(
-                                                      thumbShape:
-                                                          RoundSliderThumbShape(
-                                                              enabledThumbRadius:
-                                                                  0.0),
-                                                      trackHeight: 10,
-                                                    ),
-                                                    child: Slider(
-                                                      value: double.tryParse(ReadController
-                                                                  .getActivityByChapterId
-                                                                  .value
-                                                                  .data?[0]
-                                                                  .readChapterCount
-                                                                  .toString() ??
-                                                              '') ??
-                                                          0,
-                                                      // max: double.tryParse(ReadController.getActivityByChapterId.value.data?[0].totalChapterCount.toString()??'') ??
-                                                      max: 3,
-                                                      min: 0,
-                                                      activeColor: coral500,
-                                                      inactiveColor: coral100,
-                                                      onChanged: (value) {
-                                                        ReadController.progress(
-                                                            value);
-                                                      },
-                                                    ),
-                                                  ),
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            35),
-                                                    // half of the height/width
-                                                    child: CachedNetworkImage(
-                                                      imageUrl:
-                                                          "${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].characterImage.toString() ?? ''}",
-                                                      placeholder:
-                                                          (context, url) =>
-                                                              const Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          CircularProgressIndicator(),
-                                                        ],
-                                                      ),
-                                                      errorWidget: (context,
-                                                              url, error) =>
-                                                          Container(
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                          color: AppColors.red,
-                                                        ),
-                                                        child: const Icon(
-                                                          Icons.error_outline,
-                                                          color:
-                                                              AppColors.black,
-                                                        ),
-                                                      ),
-                                                      height: 45,
-                                                      width: 45,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  4.ph,
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                      left:
-                                                          screenSize.width / 9,
-                                                      right:
-                                                          screenSize.width / 8,
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          // "${ReadController.getActivityByChapterId.value.data?[0].readChapterCount.toString()}/${ReadController.getActivityByChapterId.value.data?[0].totalChapterCount.toString()}",
-                                                          "${ReadController.getActivityByChapterId.value.data?[0].readChapterCount.toString()}/3",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: AppTextStyle
-                                                              .normalBold12
-                                                              .copyWith(
-                                                                  color:
-                                                                      coral500),
-                                                        ),
-                                                        Text(
-                                                          // "GAMMA",
-                                                          ReadController
-                                                                  .getActivityByChapterId
-                                                                  .value
-                                                                  .data?[0]
-                                                                  .characterName
-                                                                  .toString() ??
-                                                              '',
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: AppTextStyle
-                                                              .normalBold12
-                                                              .copyWith(
-                                                                  color:
-                                                                      coral500),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+
+
+                              /// this portion is commented by Krishnansh, later will be un commented on requirement
+
+                              // SizedBox(
+                              //   width: MediaQuery.of(context).size.width / 1.1,
+                              //   child: Row(
+                              //     children: [
+                              //       Expanded(
+                              //         child: Column(
+                              //           crossAxisAlignment:
+                              //               CrossAxisAlignment.start,
+                              //           children: [
+                              //             Stack(
+                              //               alignment: Alignment.centerLeft,
+                              //               children: [
+                              //                 Padding(
+                              //                   padding: EdgeInsets.symmetric(
+                              //                       horizontal:
+                              //                           screenSize.width / 9),
+                              //                   child: Column(
+                              //                     children: [
+                              //                       Text(
+                              //                         "Only a few more chapters to unlock : "
+                              //                             .tr,
+                              //                         textAlign:
+                              //                             TextAlign.center,
+                              //                         style: AppTextStyle
+                              //                             .normalBold12
+                              //                             .copyWith(
+                              //                                 color: greyCh),
+                              //                       ),
+                              //                       4.ph,
+                              //                     ],
+                              //                   ),
+                              //                 ),
+                              //                 Stack(
+                              //                   alignment:
+                              //                       Alignment.centerRight,
+                              //                   children: [
+                              //                     SliderTheme(
+                              //                       data: const SliderThemeData(
+                              //                         thumbShape:
+                              //                             RoundSliderThumbShape(
+                              //                                 enabledThumbRadius:
+                              //                                     0.0),
+                              //                         trackHeight: 10,
+                              //                       ),
+                              //                       child: Slider(
+                              //                         value: double.tryParse(ReadController
+                              //                                     .getActivityByChapterId
+                              //                                     .value
+                              //                                     .data?[0]
+                              //                                     .readChapterCount
+                              //                                     .toString() ??
+                              //                                 '') ??
+                              //                             0,
+                              //                         // max: double.tryParse(ReadController.getActivityByChapterId.value.data?[0].totalChapterCount.toString()??'') ??
+                              //                         max: 3,
+                              //                         min: 0,
+                              //                         activeColor: coral500,
+                              //                         inactiveColor: coral100,
+                              //                         onChanged: (value) {
+                              //                           ReadController.progress(
+                              //                               value);
+                              //                         },
+                              //                       ),
+                              //                     ),
+                              //                     ClipRRect(
+                              //                       borderRadius:
+                              //                           BorderRadius.circular(
+                              //                               35),
+                              //                       // half of the height/width
+                              //                       child: CachedNetworkImage(
+                              //                         imageUrl:
+                              //                             "${DatabaseApi.mainUrlImage}${ReadController.getActivityByChapterId.value.data?[0].characterImage.toString() ?? ''}",
+                              //                         placeholder:
+                              //                             (context, url) =>
+                              //                                 const Row(
+                              //                           mainAxisAlignment:
+                              //                               MainAxisAlignment
+                              //                                   .center,
+                              //                           mainAxisSize:
+                              //                               MainAxisSize.min,
+                              //                           children: [
+                              //                             CircularProgressIndicator(),
+                              //                           ],
+                              //                         ),
+                              //                         errorWidget: (context,
+                              //                                 url, error) =>
+                              //                             Container(
+                              //                           decoration:
+                              //                               const BoxDecoration(
+                              //                             color: AppColors.red,
+                              //                           ),
+                              //                           child: const Icon(
+                              //                             Icons.error_outline,
+                              //                             color:
+                              //                                 AppColors.black,
+                              //                           ),
+                              //                         ),
+                              //                         height: 45,
+                              //                         width: 45,
+                              //                         fit: BoxFit.cover,
+                              //                       ),
+                              //                     ),
+                              //                   ],
+                              //                 ),
+                              //                 Column(
+                              //                   children: [
+                              //                     4.ph,
+                              //                     Padding(
+                              //                       padding: EdgeInsets.only(
+                              //                         left:
+                              //                             screenSize.width / 9,
+                              //                         right:
+                              //                             screenSize.width / 8,
+                              //                       ),
+                              //                       child: Row(
+                              //                         mainAxisAlignment:
+                              //                             MainAxisAlignment
+                              //                                 .spaceBetween,
+                              //                         children: [
+                              //                           Text(
+                              //                             // "${ReadController.getActivityByChapterId.value.data?[0].readChapterCount.toString()}/${ReadController.getActivityByChapterId.value.data?[0].totalChapterCount.toString()}",
+                              //                       ReadController.getActivityByChapterId.value.data?[0].readChapterCount.toString() != "null" ?
+                              //                             "${ReadController.getActivityByChapterId.value.data?[0].readChapterCount.toString()}/3" : "1/3",
+                              //                             textAlign:
+                              //                                 TextAlign.center,
+                              //                             style: AppTextStyle
+                              //                                 .normalBold12
+                              //                                 .copyWith(
+                              //                                     color:
+                              //                                         coral500),
+                              //                           ),
+                              //                           Text(
+                              //                             // "GAMMA",
+                              //                             ReadController
+                              //                                     .getActivityByChapterId
+                              //                                     .value
+                              //                                     .data?[0]
+                              //                                     .characterName
+                              //                                     .toString() ??
+                              //                                 '',
+                              //                             textAlign:
+                              //                                 TextAlign.center,
+                              //                             style: AppTextStyle
+                              //                                 .normalBold12
+                              //                                 .copyWith(
+                              //                                     color:
+                              //                                         coral500),
+                              //                           ),
+                              //                         ],
+                              //                       ),
+                              //                     ),
+                              //                   ],
+                              //                 ),
+                              //               ],
+                              //             ),
+                              //           ],
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+
+                              /// this portion is commented by Krishnansh, later will be un commented on requirement
+
                             15.ph,
                             (ReadController.chapterIdIndexForNextPage.value ==
                                     0)
@@ -383,7 +399,7 @@ class _CongratulationPageState extends State<CongratulationPage> {
                                         customPrint(
                                             'chapterIdIndexForNextPage : ${ReadController.getChapterByStoryId.value.data?.chapterData!.length}');
 
-                                        nextPage(ReadStoriesPage(
+                                        nextPage(ReadStoriesScreen(
                                           // chapter: ReadController.chapter[index]['chapter'],
 
                                           chapterId: ReadController
@@ -420,7 +436,7 @@ class _CongratulationPageState extends State<CongratulationPage> {
                                         customPrint(
                                             'chapterIdIndexForNextPage : ${ReadController.getChapterByStoryId.value.data?.chapterData!.length}');
 
-                                        nextPage(ReadStoriesPage(
+                                        nextPage(ReadStoriesScreen(
                                           // chapter: ReadController.chapter[index]['chapter'],
 
                                           chapterId: ReadController

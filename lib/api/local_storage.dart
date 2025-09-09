@@ -17,5 +17,7 @@ class LocalStorage {
   //Node Storage
   static String tokenNode = "token_node";
   static String idNode = "id_node";
-
+  
+  // Smart Ring Storage
+  static String ringDeviceId = "ring_device_id";
 }

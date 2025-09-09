@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:yokai_quiz_app/util/constants.dart';
+
 GetStoryById getStoryByIdFromJson(String str) => GetStoryById.fromJson(json.decode(str));
 
 String getStoryByIdToJson(GetStoryById data) => json.encode(data.toJson());
@@ -56,8 +58,8 @@ class Data {
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    name: json["name"],
-    discription: json["discription"],
+    name: constants.deviceLanguage=="en" ? json["name"] : json["japanese_name"],
+    discription: constants.deviceLanguage=="en" ? json["discription"] : json["japanese_description"],
     storiesImage: json["stories_image"],
     chapterCount: json["chapter_count"],
     activityCount: json["activity_count"],

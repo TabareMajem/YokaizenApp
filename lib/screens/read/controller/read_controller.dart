@@ -1,3 +1,5 @@
+/// read_controller.dart
+
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -15,6 +17,7 @@ import '../../../models/get_chapter_by_chapter_id.dart';
 import '../../../models/get_chapter_by_story_id.dart';
 import '../../../models/get_story_by_id.dart';
 import '../../../util/colors.dart';
+import '../../../screens/authentication/controller/auth_screen_controller.dart';
 
 class ReadController {
   static RxBool backToStories = false.obs;
@@ -27,22 +30,23 @@ class ReadController {
       TextEditingController();
 
   static RxList<Map> read = <Map>[
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
-    {"image": "icons/trending", "heading": "Mary’s Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
+    {"image": "icons/trending", "heading": "Mary's Adventure"},
   ].obs;
   static RxList<Map> chapter = <Map>[
     {
@@ -199,12 +203,12 @@ class ReadController {
 
   ///api
   static Rx<GetStoryById> getStoriesById = GetStoryById().obs;
-  static Rx<GetAllStory> getAllStoriesBy = GetAllStory().obs;
 
   static Future<bool> getStoryByStoriesId(String storiesId) async {
     final headers = {
       "Content-Type": "application/json",
-      "UserToken": prefs.getString(LocalStorage.token).toString()
+      "UserToken": prefs.getString(LocalStorage.token).toString(),
+      "accept-language" : constants.deviceLanguage
     };
     final String url = '${DatabaseApi.getStoriesByStoryId}$storiesId';
     customPrint("getStoryByStoryId url :: $url");
@@ -212,14 +216,15 @@ class ReadController {
       return await http
           .get(Uri.parse(url), headers: headers)
           .then((value) async {
-        print("getStoryByStoryId :: ${value.body}");
-        final jsonData = jsonDecode(value.body);
+        final result = utf8.decode(value.bodyBytes, allowMalformed: true);
+        print("getStoryByStoryId :: ${result}");
+        final jsonData = jsonDecode(result);
         if (jsonData["status"].toString() != "true") {
           showErrorMessage(jsonData["message"].toString(), colorError);
           return false;
         }
         //showSnackbar("Subscription PlanPrice Details Added Successfully", colorSuccess);
-        getStoriesById(getStoryByIdFromJson(value.body));
+        getStoriesById(getStoryByIdFromJson(result));
         return true;
       });
     } on Exception catch (e) {
@@ -229,14 +234,17 @@ class ReadController {
     }
   }
 
+  static Rx<GetAllStory> getAllStoriesBy = GetAllStory().obs;
+
+
   static Future<bool> getAllStory(String search) async {
     final headers = {
       "Content-Type": "application/json",
+      "UserToken": '${prefs.getString(LocalStorage.token).toString()}',
       "accept-language": constants.deviceLanguage,
-      "UserToken": '${prefs.getString(LocalStorage.token).toString()}'
     };
     final String url = '${DatabaseApi.getStories}?search=$search';
-    customPrint("getAllStory url :: $url");
+    customPrint("getAllStory headers :: $headers\nurl : $url");
     try {
       return await http
           .get(Uri.parse(url), headers: headers)
@@ -270,7 +278,8 @@ class ReadController {
   static Future<bool> getAllChapterByStoryId(String storyId) async {
     final headers = {
       "Content-Type": "application/json",
-      "UserToken": '${prefs.getString(LocalStorage.token).toString()}'
+      "UserToken": '${prefs.getString(LocalStorage.token).toString()}',
+      "Accept-Language" : constants.deviceLanguage,
     };
     final String url =
         '${DatabaseApi.getAllChapterByStoryId}?stories_id=$storyId';
@@ -279,14 +288,15 @@ class ReadController {
       return await http
           .get(Uri.parse(url), headers: headers)
           .then((value) async {
-        print("getAllChapterByStoryId :: ${value.body}");
-        final jsonData = jsonDecode(value.body);
+        final result = utf8.decode(value.bodyBytes, allowMalformed: true);
+        print("getAllChapterByStoryId :: $result");
+        final jsonData = jsonDecode(result);
         if (jsonData["status"].toString() != "true") {
           showErrorMessage(jsonData["message"].toString(), colorError);
           return false;
         }
         //showSnackbar("Subscription PlanPrice Details Added Successfully", colorSuccess);
-        getChapterByStoryId(getChapterByStoryIdFromJson(value.body));
+        getChapterByStoryId(getChapterByStoryIdFromJson(result));
         return true;
       });
     } on Exception catch (e) {
@@ -345,7 +355,8 @@ class ReadController {
   static Future<bool> getAllChapterByChapterId(String chapterId) async {
     final headers = {
       "Content-Type": "application/json",
-      "UserToken": '${prefs?.getString(LocalStorage.token).toString()}'
+      "UserToken": '${prefs?.getString(LocalStorage.token).toString()}',
+      "Accept-Language" : constants.deviceLanguage,
     };
     final String url = '${DatabaseApi.getAllChapterByChapterId}$chapterId';
     customPrint("getAllChapterByChapterId url :: $url");
@@ -376,22 +387,24 @@ class ReadController {
   static Future<bool> getActivityDetailsByChapterId(String chapterId) async {
     final headers = {
       "Content-Type": "application/json",
-      "UserToken": prefs.getString(LocalStorage.token).toString()
+      "UserToken": prefs.getString(LocalStorage.token).toString(),
+      "Accept-Language" : constants.deviceLanguage,
     };
     final String url = '${DatabaseApi.getActivityByChapterId}$chapterId';
-    customPrint("getActivityDetailsByChapterId url :: $url");
+    customPrint("getActivityDetailsByChapterId url :: $url}");
     try {
       return await http
           .get(Uri.parse(url), headers: headers)
           .then((value) async {
-        print("getActivityDetailsByChapterId :: ${value.body}");
-        final jsonData = jsonDecode(value.body);
+        final result = utf8.decode(value.bodyBytes, allowMalformed: true);
+        print("getActivityDetailsByChapterId :: $result");
+        final jsonData = jsonDecode(result);
         if (jsonData["status"].toString() != "true") {
           if (jsonData["message"].toString() ==
               "No activities found for the given chapter ID") {
             showErrorMessage(
-                // "We’re working on it or “Soon you will have a Story here",
-                "We’re working on it or “Soon you will have a Activity here",
+                // "We're working on it or "Soon you will have a Story here",
+                "We are working on it or Soon you will have a Activity here".tr,
                 colorError);
           } else {
             // showErrorMessage(jsonData["message"].toString(), colorError);
@@ -401,7 +414,7 @@ class ReadController {
         }
         //showSnackbar("Subscription PlanPrice Details Added Successfully", colorSuccess);
         isActivityAvailable(true);
-        getActivityByChapterId(getActivityByChapterIdFromJson(value.body));
+        getActivityByChapterId(getActivityByChapterIdFromJson(result));
         return true;
       });
     } on Exception catch (e) {
@@ -475,6 +488,94 @@ class ReadController {
     } catch (e) {
       print('Error decoding API string: $e');
       return 'Error decoding API string';
+    }
+  }
+
+  /// Unlock character API
+  static Future<bool> unlockCharacter(String characterId) async {
+    customPrint("=== unlockCharacter START ===");
+    customPrint("Unlocking character with ID: $characterId");
+    
+    // Get user ID from shared preferences, with fallback to profile if needed
+    String? userId = prefs.getString(LocalStorage.id);
+
+    customPrint("unlockCharacter userId : $userId");
+    
+    // If user ID is not found in SharedPreferences
+    if (userId == null || userId.isEmpty) {
+      customPrint("User ID not found in SharedPreferences, attempting to get from profile");
+      
+      // Try to get user ID from profile
+      if (AuthScreenController.getProfileModel.value.user?.userId != null) {
+        userId = AuthScreenController.getProfileModel.value.user!.userId.toString();
+        customPrint("Retrieved user ID from profile: $userId");
+        
+        // Save it to SharedPreferences for future use
+        await prefs.setString(LocalStorage.id, userId);
+      } else {
+        // If still no user ID, try to get profile from API
+        customPrint("Attempting to get user profile from API");
+        bool profileSuccess = await AuthScreenController.getProfile();
+        
+        if (profileSuccess && AuthScreenController.getProfileModel.value.user?.userId != null) {
+          userId = AuthScreenController.getProfileModel.value.user!.userId.toString();
+          customPrint("Retrieved user ID from API profile call: $userId");
+          
+          // Save it to SharedPreferences for future use
+          await prefs.setString(LocalStorage.id, userId);
+        } else {
+          customPrint("Error: Unable to retrieve user ID from any source");
+          return false;
+        }
+      }
+    }
+
+    customPrint("Using user ID: $userId for character unlock");
+    
+    final String url = '${DatabaseApi.unlockCharacter}?character_id=$characterId&user_id=$userId';
+    final headers = {
+      "accept": "application/json",
+      "UserToken": prefs.getString(LocalStorage.token).toString(),
+      "accept-language": constants.deviceLanguage
+    };
+    
+    customPrint("unlockCharacter url :: $url");
+    customPrint("unlockCharacter headers :: $headers");
+    
+    try {
+      customPrint("Making API call to unlock character...");
+      return await http
+          .post(
+        Uri.parse(url),
+        headers: headers,
+      )
+          .then((value) async {
+        customPrint("unlockCharacter API response status code: ${value.statusCode}");
+        customPrint("unlockCharacter response :: ${value.body}");
+        
+        try {
+          final jsonData = jsonDecode(value.body);
+          customPrint("unlockCharacter response decoded: $jsonData");
+          
+          if (jsonData["status"].toString() != "true") {
+            showErrorMessage(jsonData["message"].toString(), colorError);
+            customPrint("unlockCharacter FAILED: ${jsonData["message"]}");
+            return false;
+          }
+          
+          customPrint("unlockCharacter SUCCESS");
+          return true;
+        } catch (e) {
+          customPrint("Error decoding API response: $e");
+          return false;
+        }
+      });
+    } on Exception catch (e) {
+      customPrint("unlockCharacter network error :: $e");
+      showErrorMessage("Failed to unlock character. Please try again.", colorError);
+      return false;
+    } finally {
+      customPrint("=== unlockCharacter END ===");
     }
   }
 
